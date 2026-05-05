@@ -27,7 +27,11 @@ set(CMAKE_CXX_FLAGS_MINSIZEREL "" CACHE STRING "" FORCE)
 set(CMAKE_EXE_LINKER_FLAGS_MINSIZEREL "" CACHE STRING "" FORCE)
 
 # Define kernel executable
-add_executable(kernel kmain.cpp)
+add_executable(kernel
+  kmain.cpp
+  kernel/runtime.cpp
+)
+target_include_directories(kernel PRIVATE kernel/include libc/include)
 set_target_properties(kernel PROPERTIES OUTPUT_NAME "hillpoint")
 
 # Fetch latest limine.h header from source and provide it to compilers include path

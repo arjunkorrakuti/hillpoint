@@ -1,3 +1,4 @@
+#include <kernel/runtime.hpp>
 #include <limine.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -30,7 +31,5 @@ extern "C" void kmain() {
     }
   }
 
-  while (true) {
-    asm("hlt");
-  }
+  halt();
 }
