@@ -3,14 +3,28 @@
 #include <stddef.h>
 #include <stdint.h>
 
+namespace {
+  __attribute__((used, section(".limine_requests_start")))
+  volatile uint64_t requestsStart[] = LIMINE_REQUESTS_START_MARKER;
+
+  __attribute__((used, section(".limine_requests")))
+  volatile uint64_t baseRevision[] = LIMINE_BASE_REVISION(6);
+
+  __attribute__((used, section(".limine_requests_end")))
+  volatile uint64_t requestsEnd[] = LIMINE_REQUESTS_END_MARKER;
+}
+
 extern "C" void kmain() {
+  if (!LIMINE_BASE_REVISION_SUPPORTED(baseRevision)) {
+    halt();
+  }
   const uint8_t limineRevision = 6;
 
   // Create a framebuffer request and place it in the requests section
   // of the final executable
   __attribute__((
     used,
-    section(".limine_requests"))) static const volatile struct limine_framebuffer_request
+    section(".limine_requests"))) static volatile struct limine_framebuffer_request
     framebufferRequest = {.id = LIMINE_FRAMEBUFFER_REQUEST_ID,
                           .revision = limineRevision,
                           .response = nullptr};
