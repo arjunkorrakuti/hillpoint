@@ -18,15 +18,13 @@ extern "C" void kmain() {
   if (!LIMINE_BASE_REVISION_SUPPORTED(baseRevision)) {
     halt();
   }
-  const uint8_t limineRevision = 6;
-
   // Create a framebuffer request and place it in the requests section
   // of the final executable
   __attribute__((
     used,
     section(".limine_requests"))) static volatile struct limine_framebuffer_request
     framebufferRequest = {.id = LIMINE_FRAMEBUFFER_REQUEST_ID,
-                          .revision = limineRevision,
+                          .revision = 0,
                           .response = nullptr};
 
   // Take our first framebuffer and get the address of memory
