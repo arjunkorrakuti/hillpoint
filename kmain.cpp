@@ -27,6 +27,13 @@ extern "C" void kmain() {
                           .revision = 0,
                           .response = nullptr};
 
+  if (framebufferRequest.response == nullptr ||
+      framebufferRequest.response->framebuffer_count == 0 ||
+      framebufferRequest.response->framebuffers == nullptr ||
+      framebufferRequest.response->framebuffers[0] == nullptr) {
+    halt();
+  }
+
   // Take our first framebuffer and get the address of memory
   struct limine_framebuffer const* framebuffer =
     framebufferRequest.response->framebuffers[0];
