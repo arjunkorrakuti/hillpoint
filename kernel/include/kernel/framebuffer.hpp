@@ -17,3 +17,8 @@ struct Framebuffer {
   uint8_t blueShift;
 };
 
+
+namespace graphics {
+  bool initialize(const Framebuffer& framebuffer);
+  void pixel(size_t x, size_t y, uint32_t color);
+}

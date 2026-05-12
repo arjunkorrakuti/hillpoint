@@ -6,15 +6,14 @@ extern "C" void kmain() {
     halt();
   }
   const Framebuffer framebuffer = boot::framebuffer();
-  if (framebuffer.address == nullptr || framebuffer.bpp != 32) {
+  if (!graphics::initialize(framebuffer)) {
     halt();
   }
-  auto* pixels = static_cast<volatile uint32_t*>(framebuffer.address);
   for (size_t y = 0; y < framebuffer.height; y++) {
     for (size_t x = 0; x < framebuffer.width; x++) {
       const uint32_t blue = x * 255 / framebuffer.width;
       const uint32_t green = y * 255 / framebuffer.height;
-      pixels[y * (framebuffer.pitch / 4) + x] = (green << 8) | blue;
+      graphics::pixel(x, y, (green << 8) | blue);
     }
   }
   halt();
