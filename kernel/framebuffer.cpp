@@ -13,6 +13,9 @@ bool graphics::initialize(const Framebuffer& framebuffer) {
 }
 
 void graphics::pixel(size_t x, size_t y, uint32_t color) {
+  if (x >= screen.width || y >= screen.height) {
+    return;
+  }
   auto* pixels = static_cast<volatile uint32_t*>(screen.address);
   pixels[y * (screen.pitch / 4) + x] = color;
 }
