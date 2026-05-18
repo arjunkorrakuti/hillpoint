@@ -23,12 +23,22 @@ bool boot::supported() {
 Framebuffer boot::framebuffer() {
   const auto* response = framebufferRequest.response;
   if (response == nullptr || response->framebuffer_count == 0 ||
-      response->framebuffers == nullptr || response->framebuffers[0] == nullptr) {
+      response->framebuffers == nullptr) {
     return {};
   }
-  const auto* buffer = response->framebuffers[0];
-  return {buffer->address, buffer->width, buffer->height, buffer->pitch, buffer->bpp,
-          buffer->red_mask_size, buffer->red_mask_shift,
-          buffer->green_mask_size, buffer->green_mask_shift,
-          buffer->blue_mask_size, buffer->blue_mask_shift};
+  for (uint64_t index = 0; index < response->framebuffer_count; index++) {
+    const auto* buffer = response->framebuffers[index];
+    if (buffer == nullptr || buffer->memory_model != LIMINE_FRAMEBUFFER_RGB) {
+      continue;
+    }
+    Framebuffer candidate = {buffer->address, buffer->width, buffer->height,
+                             buffer->pitch, buffer->bpp,
+                             buffer->red_mask_size, buffer->red_mask_shift,
+                             buffer->green_mask_size, buffer->green_mask_shift,
+                             buffer->blue_mask_size, buffer->blue_mask_shift};
+    if (graphics::supported(candidate)) {
+      return candidate;
+    }
+  }
+  return {};
 }
