@@ -21,5 +21,8 @@ struct Framebuffer {
 namespace graphics {
   bool supported(const Framebuffer& framebuffer);
   bool initialize(const Framebuffer& framebuffer);
+  size_t width();
+  size_t height();
+  void clear(uint32_t color);
   void pixel(size_t x, size_t y, uint32_t color);
 }

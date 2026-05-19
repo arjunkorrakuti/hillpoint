@@ -44,3 +44,19 @@ bool graphics::supported(const Framebuffer& framebuffer) {
   const uint32_t blue = 0xffU << framebuffer.blueShift;
   return (red & green) == 0 && (red & blue) == 0 && (green & blue) == 0;
 }
+
+size_t graphics::width() {
+  return screen.width;
+}
+
+size_t graphics::height() {
+  return screen.height;
+}
+
+void graphics::clear(uint32_t color) {
+  for (size_t y = 0; y < screen.height; y++) {
+    for (size_t x = 0; x < screen.width; x++) {
+      pixel(x, y, color);
+    }
+  }
+}
