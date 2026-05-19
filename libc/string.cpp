@@ -9,3 +9,11 @@ extern "C" void* memcpy(void* destination, const void* source, size_t size) {
   }
   return destination;
 }
+
+extern "C" void* memset(void* destination, int value, size_t size) {
+  auto* output = static_cast<unsigned char*>(destination);
+  for (size_t index = 0; index < size; index++) {
+    output[index] = static_cast<unsigned char>(value);
+  }
+  return destination;
+}
