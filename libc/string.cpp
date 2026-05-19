@@ -30,3 +30,14 @@ extern "C" void* memmove(void* destination, const void* source, size_t size) {
   }
   return destination;
 }
+
+extern "C" int memcmp(const void* left, const void* right, size_t size) {
+  const auto* first = static_cast<const unsigned char*>(left);
+  const auto* second = static_cast<const unsigned char*>(right);
+  for (size_t index = 0; index < size; index++) {
+    if (first[index] != second[index]) {
+      return first[index] - second[index];
+    }
+  }
+  return 0;
+}
