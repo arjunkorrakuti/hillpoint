@@ -41,3 +41,11 @@ extern "C" int memcmp(const void* left, const void* right, size_t size) {
   }
   return 0;
 }
+
+extern "C" size_t strlen(const char* string) {
+  size_t size = 0;
+  while (string[size] != '\0') {
+    size++;
+  }
+  return size;
+}

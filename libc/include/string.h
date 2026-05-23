@@ -14,6 +14,8 @@ void* memmove(void* destination, const void* source, size_t size);
 
 int memcmp(const void* left, const void* right, size_t size);
 
+size_t strlen(const char* string);
+
 #ifdef __cplusplus
 }
 #endif
