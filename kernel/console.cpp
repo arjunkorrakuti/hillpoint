@@ -1,5 +1,6 @@
 #include <kernel/console.hpp>
 #include <kernel/font.hpp>
+#include <string.h>
 
 namespace {
   size_t column = 0;
@@ -35,4 +36,14 @@ void console::putchar(char character) {
     draw(character);
     column++;
   }
+}
+
+void console::write(const char* string, size_t size) {
+  for (size_t index = 0; index < size; index++) {
+    putchar(string[index]);
+  }
+}
+
+void console::write(const char* string) {
+  write(string, strlen(string));
 }
