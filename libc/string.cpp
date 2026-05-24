@@ -49,3 +49,11 @@ extern "C" size_t strlen(const char* string) {
   }
   return size;
 }
+
+extern "C" int strcmp(const char* left, const char* right) {
+  while (*left != '\0' && *left == *right) {
+    left++;
+    right++;
+  }
+  return static_cast<unsigned char>(*left) - static_cast<unsigned char>(*right);
+}

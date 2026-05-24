@@ -16,6 +16,8 @@ int memcmp(const void* left, const void* right, size_t size);
 
 size_t strlen(const char* string);
 
+int strcmp(const char* left, const char* right);
+
 #ifdef __cplusplus
 }
 #endif
