@@ -10,6 +10,11 @@ namespace {
   constexpr uint32_t foreground = 0xffffff;
   constexpr uint32_t background = 0;
 
+  void newline() {
+    column = 0;
+    row++;
+  }
+
   void draw(char character) {
     for (size_t y = 0; y < font::height; y++) {
       for (size_t x = 0; x < font::width; x++) {
@@ -32,6 +37,10 @@ bool console::initialize(const Framebuffer& framebuffer) {
 }
 
 void console::putchar(char character) {
+  if (character == '\n') {
+    newline();
+    return;
+  }
   if (column < columns && row < rows) {
     draw(character);
     column++;
