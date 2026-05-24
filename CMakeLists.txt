@@ -34,6 +34,7 @@ add_executable(kernel
   kernel/framebuffer.cpp
   libc/string.cpp
   kernel/font.cpp
+  kernel/console.cpp
 )
 target_include_directories(kernel PRIVATE kernel/include libc/include)
 set_target_properties(kernel PROPERTIES OUTPUT_NAME "hillpoint")
