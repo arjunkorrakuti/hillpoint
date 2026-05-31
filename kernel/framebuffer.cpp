@@ -60,3 +60,20 @@ void graphics::clear(uint32_t color) {
     }
   }
 }
+
+void graphics::scroll(size_t rows, uint32_t color) {
+  if (rows > screen.height) {
+    rows = screen.height;
+  }
+  for (size_t y = 0; y < screen.height - rows; y++) {
+    for (size_t x = 0; x < screen.width; x++) {
+      row(y)[x] = row(y + rows)[x];
+    }
+  }
+  const uint32_t encoded = encode(color);
+  for (size_t y = screen.height - rows; y < screen.height; y++) {
+    for (size_t x = 0; x < screen.width; x++) {
+      row(y)[x] = encoded;
+    }
+  }
+}

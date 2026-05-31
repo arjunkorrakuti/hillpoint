@@ -13,6 +13,10 @@ namespace {
   void newline() {
     column = 0;
     row++;
+    if (row == rows) {
+      graphics::scroll(font::height, background);
+      row--;
+    }
   }
 
   void draw(char character) {
