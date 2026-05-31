@@ -37,6 +37,9 @@ bool console::initialize(const Framebuffer& framebuffer) {
 }
 
 void console::putchar(char character) {
+  if (column == columns && character != '\n') {
+    newline();
+  }
   if (character == '\n') {
     newline();
     return;
