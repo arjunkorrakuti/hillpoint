@@ -1,0 +1,30 @@
+#include <format.hpp>
+#include <stdarg.h>
+#include <stdint.h>
+#include <string.h>
+
+size_t format::write(Writer writer, void* context, const char* pattern,
+                     va_list arguments) {
+  size_t count = 0;
+  auto emit = [&](char character) {
+    writer(character, context);
+    count++;
+  };
+  while (*pattern != '\0') {
+    if (*pattern != '%') {
+      emit(*pattern++);
+      continue;
+    }
+    pattern++;
+    if (*pattern == 's') {
+      const char* string = va_arg(arguments, const char*);
+      while (*string != '\0') {
+        emit(*string++);
+      }
+      pattern++;
+    } else {
+      emit('%');
+    }
+  }
+  return count;
+}
