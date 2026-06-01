@@ -58,5 +58,5 @@ bool font::pixel(unsigned char character, size_t x, size_t y) {
   if (character < 32 || character > 126) {
     character = '?';
   }
-  return x < 5 && y < 7 && (glyphs[character - 32][x] & (1U << y)) != 0;
+  return x < 10 && y < 14 && (glyphs[character - 32][x / 2] & (1U << (y / 2))) != 0;
 }
