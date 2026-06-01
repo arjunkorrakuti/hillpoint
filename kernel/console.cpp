@@ -31,12 +31,16 @@ namespace {
 }
 
 bool console::initialize(const Framebuffer& framebuffer) {
+  columns = 0;
+  rows = 0;
+  column = 0;
+  row = 0;
   if (!graphics::initialize(framebuffer)) {
     return false;
   }
   columns = graphics::width() / font::width;
   rows = graphics::height() / font::height;
-  graphics::clear(background);
+  clear();
   return columns != 0 && rows != 0;
 }
 
@@ -62,4 +66,10 @@ void console::write(const char* string, size_t size) {
 
 void console::write(const char* string) {
   write(string, strlen(string));
+}
+
+void console::clear() {
+  graphics::clear(background);
+  column = 0;
+  row = 0;
 }
