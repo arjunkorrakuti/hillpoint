@@ -22,6 +22,11 @@ size_t format::write(Writer writer, void* context, const char* pattern,
         emit(*string++);
       }
       pattern++;
+    } else if (*pattern == 'c') {
+      emit(static_cast<char>(va_arg(arguments, int)));
+      pattern++;
+    } else if (*pattern == '%') {
+      emit(*pattern++);
     } else {
       emit('%');
     }
