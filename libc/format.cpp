@@ -18,6 +18,9 @@ size_t format::write(Writer writer, void* context, const char* pattern,
     pattern++;
     if (*pattern == 's') {
       const char* string = va_arg(arguments, const char*);
+      if (string == nullptr) {
+        string = "(null)";
+      }
       while (*string != '\0') {
         emit(*string++);
       }
