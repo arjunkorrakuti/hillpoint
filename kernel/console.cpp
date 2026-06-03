@@ -1,3 +1,4 @@
+#include <format.hpp>
 #include <kernel/console.hpp>
 #include <kernel/font.hpp>
 #include <string.h>
@@ -17,6 +18,10 @@ namespace {
       graphics::scroll(font::height, background);
       row--;
     }
+  }
+
+  void output(char character, void*) {
+    console::putchar(character);
   }
 
   void draw(char character) {
@@ -72,4 +77,16 @@ void console::clear() {
   graphics::clear(background);
   column = 0;
   row = 0;
+}
+
+size_t console::vprintf(const char* pattern, va_list arguments) {
+  return format::write(output, nullptr, pattern, arguments);
+}
+
+size_t console::printf(const char* pattern, ...) {
+  va_list arguments;
+  va_start(arguments, pattern);
+  const size_t count = vprintf(pattern, arguments);
+  va_end(arguments);
+  return count;
 }
