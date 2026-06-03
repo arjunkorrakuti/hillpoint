@@ -47,7 +47,7 @@ size_t format::write(Writer writer,
       continue;
     }
     const bool pointer = false;
-    const bool signedValue = specifier == 'd';
+    const bool signedValue = specifier == 'd' || specifier == 'i';
     if (!pointer && !signedValue && specifier != 'u' && specifier != 'x' &&
         specifier != 'X') {
       while (start != pattern) {
