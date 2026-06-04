@@ -4,7 +4,7 @@
 #include <string.h>
 
 namespace {
-  enum class Length { normal, longValue };
+  enum class Length { normal, longValue, longLongValue };
 }
 
 size_t format::write(Writer writer,
@@ -26,6 +26,10 @@ size_t format::write(Writer writer,
     if (*pattern == 'l') {
       pattern++;
       length = Length::longValue;
+      if (*pattern == 'l') {
+        pattern++;
+        length = Length::longLongValue;
+      }
     }
     const char specifier = *pattern;
     if (specifier != '\0') {
@@ -72,6 +76,9 @@ size_t format::write(Writer writer,
         case Length::longValue:
           number = va_arg(arguments, long);
           break;
+        case Length::longLongValue:
+          number = va_arg(arguments, long long);
+          break;
       }
       negative = number < 0;
       value = negative ? uint64_t {0} - static_cast<uint64_t>(number)
@@ -83,6 +90,9 @@ size_t format::write(Writer writer,
           break;
         case Length::longValue:
           value = va_arg(arguments, unsigned long);
+          break;
+        case Length::longLongValue:
+          value = va_arg(arguments, unsigned long long);
           break;
       }
     }
