@@ -36,6 +36,7 @@ add_executable(kernel
   kernel/font.cpp
   kernel/console.cpp
   libc/format.cpp
+  kernel/arch/x86_64/serial.cpp
 )
 target_include_directories(kernel PRIVATE kernel/include libc/include)
 set_target_properties(kernel PROPERTIES OUTPUT_NAME "hillpoint")
