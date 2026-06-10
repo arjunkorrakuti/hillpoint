@@ -18,8 +18,10 @@ void serial::initialize() {
   out(port + 1, 0x00);
   out(port + 3, 0x03);
   out(port + 2, 0xc7);
+  out(port + 4, 0x1e);
+  out(port, 0xae);
+  ready = in(port) == 0xae;
   out(port + 4, 0x0f);
-  ready = true;
 }
 
 void serial::putchar(char character) {
