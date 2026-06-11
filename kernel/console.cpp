@@ -52,17 +52,30 @@ bool console::initialize(const Framebuffer& framebuffer) {
 
 void console::putchar(char character) {
   serial::putchar(character);
+  if (character == '\b') {
+    serial::putchar(' ');
+    serial::putchar('\b');
+  }
   if (columns == 0 || rows == 0) {
     return;
   }
-  if (column == columns && character != '\n') {
-    newline();
-  }
   if (character == '\n') {
     newline();
-    return;
-  }
-  if (column < columns && row < rows) {
+  } else if (character == '\b') {
+    if (column != 0) {
+      column--;
+    } else if (row != 0) {
+      row--;
+      column = columns - 1;
+    } else {
+      return;
+    }
+    draw(' ');
+  } else if (static_cast<unsigned char>(character) >= 32) {
+    // Wait to wrap so a newline after a full line does not skip a row
+    if (column == columns) {
+      newline();
+    }
     draw(character);
     column++;
   }
