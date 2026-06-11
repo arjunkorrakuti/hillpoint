@@ -6,7 +6,7 @@
 extern "C" void kmain() {
   serial::initialize();
   if (!boot::supported()) {
-    halt();
+    panic("Unsupported Limine base revision");
   }
   console::initialize(boot::framebuffer());
   console::write("Hillpoint\nA small x86-64 kernel\n");
