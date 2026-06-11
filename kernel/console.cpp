@@ -1,6 +1,7 @@
 #include <format.hpp>
 #include <kernel/console.hpp>
 #include <kernel/font.hpp>
+#include <kernel/serial.hpp>
 #include <string.h>
 
 namespace {
@@ -50,6 +51,10 @@ bool console::initialize(const Framebuffer& framebuffer) {
 }
 
 void console::putchar(char character) {
+  serial::putchar(character);
+  if (columns == 0 || rows == 0) {
+    return;
+  }
   if (column == columns && character != '\n') {
     newline();
   }
