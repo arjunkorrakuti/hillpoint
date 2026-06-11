@@ -28,8 +28,12 @@ void serial::putchar(char character) {
   if (!ready) {
     return;
   }
-  while ((in(port + 5) & 0x20) == 0) {
+  // A missing or stalled UART must not stop the kernel from booting
+  for (size_t attempt = 0; attempt < 100000; attempt++) {
+    if ((in(port + 5) & 0x20) != 0) {
+      out(port, static_cast<uint8_t>(character));
+      return;
+    }
     asm volatile("pause");
   }
-  out(port, static_cast<uint8_t>(character));
 }
