@@ -28,6 +28,9 @@ void serial::putchar(char character) {
   if (!ready) {
     return;
   }
+  if (character == '\n') {
+    putchar('\r');
+  }
   // A missing or stalled UART must not stop the kernel from booting
   for (size_t attempt = 0; attempt < 100000; attempt++) {
     if ((in(port + 5) & 0x20) != 0) {
