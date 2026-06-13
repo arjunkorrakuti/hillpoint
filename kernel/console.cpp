@@ -51,6 +51,9 @@ bool console::initialize(const Framebuffer& framebuffer) {
 }
 
 void console::putchar(char character) {
+  if (character == '\t') {
+    return;
+  }
   serial::putchar(character);
   if (character == '\b') {
     serial::putchar(' ');
