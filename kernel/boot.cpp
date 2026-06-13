@@ -1,4 +1,5 @@
 #include <kernel/boot.hpp>
+#include <kernel/console.hpp>
 #include <limine.h>
 
 namespace {
@@ -11,6 +12,10 @@ namespace {
   __attribute__((used, section(".limine_requests")))
   volatile limine_framebuffer_request framebufferRequest = {
     .id = LIMINE_FRAMEBUFFER_REQUEST_ID, .revision = 0, .response = nullptr};
+
+  __attribute__((used, section(".limine_requests")))
+  volatile limine_bootloader_info_request infoRequest = {
+    .id = LIMINE_BOOTLOADER_INFO_REQUEST_ID, .revision = 0, .response = nullptr};
 
   __attribute__((used, section(".limine_requests_end")))
   volatile uint64_t requestsEnd[] = LIMINE_REQUESTS_END_MARKER;
@@ -41,4 +46,11 @@ Framebuffer boot::framebuffer() {
     }
   }
   return {};
+}
+
+void boot::printSummary() {
+  const auto* info = infoRequest.response;
+  if (info != nullptr) {
+    console::printf("Bootloader: %s %s\n", info->name, info->version);
+  }
 }

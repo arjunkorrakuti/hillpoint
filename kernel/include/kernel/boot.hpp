@@ -5,4 +5,5 @@
 namespace boot {
   bool supported();
   Framebuffer framebuffer();
+  void printSummary();
 }

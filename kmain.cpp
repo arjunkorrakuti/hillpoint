@@ -10,5 +10,6 @@ extern "C" void kmain() {
   }
   console::initialize(boot::framebuffer());
   console::write("Hillpoint\nA small x86-64 kernel\n");
+  boot::printSummary();
   halt();
 }
