@@ -53,4 +53,10 @@ void boot::printSummary() {
   if (info != nullptr) {
     console::printf("Bootloader: %s %s\n", info->name, info->version);
   }
+  if (graphics::width() != 0) {
+    console::printf("Framebuffer: %zu x %zu, 32-bit RGB\n",
+                    graphics::width(), graphics::height());
+  } else {
+    console::printf("Framebuffer unavailable; using serial output.\n");
+  }
 }
