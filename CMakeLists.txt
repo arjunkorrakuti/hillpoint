@@ -6,7 +6,7 @@ include(FetchContent)
 # Stop CMake from trying to compile a non-freestanding test program with a freestanding compiler
 set(CMAKE_TRY_COMPILE_TARGET_TYPE "STATIC_LIBRARY")
 
-project(hillpoint LANGUAGES CXX)
+project(hillpoint LANGUAGES CXX ASM)
 
 # Set C++23 standard and enforce
 set(CMAKE_CXX_STANDARD 23)
@@ -37,6 +37,8 @@ add_executable(kernel
   kernel/console.cpp
   libc/format.cpp
   kernel/arch/x86_64/serial.cpp
+  kernel/arch/x86_64/interrupts.S
+  kernel/arch/x86_64/interrupts.cpp
 )
 target_include_directories(kernel PRIVATE kernel/include libc/include)
 set_target_properties(kernel PROPERTIES OUTPUT_NAME "hillpoint")
@@ -115,6 +117,7 @@ target_compile_options(kernel PRIVATE
 target_link_options(kernel PRIVATE
   -nostdlib
   -static
+  -Wl,-z,noexecstack
   -z max-page-size=0x1000
   -T${PROJECT_SOURCE_DIR}/linker.lds
   -Wl,-Map=kernel.map
