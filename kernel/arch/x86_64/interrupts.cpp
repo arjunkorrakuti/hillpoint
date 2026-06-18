@@ -87,5 +87,14 @@ extern "C" void interruptDispatch(const interrupts::Frame* frame) {
                   static_cast<unsigned long long>(frame->rip),
                   static_cast<unsigned long long>(frame->rsp),
                   static_cast<unsigned long long>(frame->error));
+  if (frame->vector == 14) {
+    uintptr_t address;
+    asm volatile("mov %%cr2, %0" : "=r"(address));
+    console::printf("Fault address=%llx (%s, %s, %s)\n",
+                    static_cast<unsigned long long>(address),
+                    (frame->error & 1) != 0 ? "protection" : "not present",
+                    (frame->error & 2) != 0 ? "write" : "read",
+                    (frame->error & 4) != 0 ? "user" : "kernel");
+  }
   panic("Unhandled CPU exception");
 }
