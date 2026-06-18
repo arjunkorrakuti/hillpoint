@@ -19,6 +19,39 @@ namespace {
     uint32_t reserved;
   };
 
+  const char* const exceptions[32] = {"Divide error",
+                                      "Debug",
+                                      "Non-maskable interrupt",
+                                      "Breakpoint",
+                                      "Overflow",
+                                      "Bounds",
+                                      "Invalid opcode",
+                                      "Device unavailable",
+                                      "Double fault",
+                                      "Reserved",
+                                      "Invalid TSS",
+                                      "Segment not present",
+                                      "Stack fault",
+                                      "General protection",
+                                      "Page fault",
+                                      "Reserved",
+                                      "x87 error",
+                                      "Alignment check",
+                                      "Machine check",
+                                      "SIMD error",
+                                      "Virtualization",
+                                      "Control protection",
+                                      "Reserved",
+                                      "Reserved",
+                                      "Reserved",
+                                      "Reserved",
+                                      "Reserved",
+                                      "Reserved",
+                                      "Hypervisor injection",
+                                      "VMM communication",
+                                      "Security",
+                                      "Reserved"};
+
   static_assert(sizeof(Gate) == 16);
   static_assert(offsetof(interrupts::Frame, vector) == 15 * 8);
   alignas(16) Gate gates[32] = {};
@@ -48,8 +81,11 @@ void interrupts::initialize() {
 }
 
 extern "C" void interruptDispatch(const interrupts::Frame* frame) {
-  console::printf("Exception %llu at %llx\n",
+  console::printf("\nException %llu: %s\nRIP=%llx RSP=%llx error=%llx\n",
                   static_cast<unsigned long long>(frame->vector),
-                  static_cast<unsigned long long>(frame->rip));
+                  frame->vector < 32 ? exceptions[frame->vector] : "Unexpected vector",
+                  static_cast<unsigned long long>(frame->rip),
+                  static_cast<unsigned long long>(frame->rsp),
+                  static_cast<unsigned long long>(frame->error));
   panic("Unhandled CPU exception");
 }
