@@ -30,7 +30,7 @@ interrupt\number:
 .endm
 
 .set vector, 0
-.rept 32
+.rept 256
   stub %vector
   .set vector, vector + 1
 .endr
@@ -86,7 +86,7 @@ interruptStubs:
   .quad interrupt\number
 .endm
 .set vector, 0
-.rept 32
+.rept 256
   address %vector
   .set vector, vector + 1
 .endr

@@ -54,18 +54,18 @@ namespace {
 
   static_assert(sizeof(Gate) == 16);
   static_assert(offsetof(interrupts::Frame, vector) == 15 * 8);
-  alignas(16) Gate gates[32] = {};
+  alignas(16) Gate gates[256] = {};
   alignas(16) uint64_t gdt[3] = {0, 0x00af9a000000ffff, 0x00cf92000000ffff};
 }
 
 extern "C" void loadGdt(const Descriptor* descriptor);
-extern "C" const uintptr_t interruptStubs[32];
+extern "C" const uintptr_t interruptStubs[256];
 
 void interrupts::initialize() {
   asm volatile("cli" ::: "memory");
   const Descriptor gdtDescriptor = {sizeof(gdt) - 1, reinterpret_cast<uintptr_t>(gdt)};
   loadGdt(&gdtDescriptor);
-  for (size_t index = 0; index < 32; index++) {
+  for (size_t index = 0; index < 256; index++) {
     const uintptr_t handler = interruptStubs[index];
     gates[index] = {.low = static_cast<uint16_t>(handler),
                     .selector = 0x08,
