@@ -52,10 +52,23 @@ namespace {
                                       "Security",
                                       "Reserved"};
 
+  struct __attribute__((packed)) TaskState {
+    uint32_t reserved0;
+    uint64_t rsp[3];
+    uint64_t reserved1;
+    uint64_t stacks[7];
+    uint64_t reserved2;
+    uint16_t reserved3;
+    uint16_t ioMap;
+  };
+
+  static_assert(sizeof(TaskState) == 104);
   static_assert(sizeof(Gate) == 16);
   static_assert(offsetof(interrupts::Frame, vector) == 15 * 8);
   alignas(16) Gate gates[256] = {};
-  alignas(16) uint64_t gdt[3] = {0, 0x00af9a000000ffff, 0x00cf92000000ffff};
+  alignas(16) uint64_t gdt[5] = {0, 0x00af9a000000ffff, 0x00cf92000000ffff, 0, 0};
+  alignas(16) TaskState task = {};
+  alignas(16) uint8_t faultStack[16384];
 }
 
 extern "C" void loadGdt(const Descriptor* descriptor);
@@ -63,13 +76,19 @@ extern "C" const uintptr_t interruptStubs[256];
 
 void interrupts::initialize() {
   asm volatile("cli" ::: "memory");
+  task.stacks[0] = reinterpret_cast<uintptr_t>(faultStack + sizeof(faultStack));
+  task.ioMap = sizeof(TaskState);
+  const uintptr_t address = reinterpret_cast<uintptr_t>(&task);
+  gdt[3] = (sizeof(TaskState) - 1) | ((address & 0xffffff) << 16) |
+    (uint64_t {0x89} << 40) | (((address >> 24) & 0xff) << 56);
+  gdt[4] = address >> 32;
   const Descriptor gdtDescriptor = {sizeof(gdt) - 1, reinterpret_cast<uintptr_t>(gdt)};
   loadGdt(&gdtDescriptor);
   for (size_t index = 0; index < 256; index++) {
     const uintptr_t handler = interruptStubs[index];
     gates[index] = {.low = static_cast<uint16_t>(handler),
                     .selector = 0x08,
-                    .stack = 0,
+                    .stack = static_cast<uint8_t>(index == 8 ? 1 : 0),
                     .attributes = 0x8e,
                     .middle = static_cast<uint16_t>(handler >> 16),
                     .high = static_cast<uint32_t>(handler >> 32),

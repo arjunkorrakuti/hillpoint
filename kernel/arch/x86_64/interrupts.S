@@ -15,6 +15,8 @@ loadGdt:
   xorw %ax, %ax
   movw %ax, %fs
   movw %ax, %gs
+  movw $0x18, %ax
+  ltr %ax
   ret
 .size loadGdt, .-loadGdt
 
