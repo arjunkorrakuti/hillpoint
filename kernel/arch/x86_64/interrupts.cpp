@@ -64,6 +64,27 @@ namespace {
   };
 
   static_assert(sizeof(TaskState) == 104);
+  void remapPic() {
+    io::out(0x20, 0x11);
+    io::wait();
+    io::out(0xa0, 0x11);
+    io::wait();
+    io::out(0x21, 32);
+    io::wait();
+    io::out(0xa1, 40);
+    io::wait();
+    io::out(0x21, 4);
+    io::wait();
+    io::out(0xa1, 2);
+    io::wait();
+    io::out(0x21, 1);
+    io::wait();
+    io::out(0xa1, 1);
+    io::wait();
+    io::out(0x21, 0xff);
+    io::out(0xa1, 0xff);
+  }
+
   static_assert(sizeof(Gate) == 16);
   static_assert(offsetof(interrupts::Frame, vector) == 15 * 8);
   alignas(16) Gate gates[256] = {};
@@ -98,6 +119,7 @@ void interrupts::initialize() {
   const Descriptor idt = {.limit = sizeof(gates) - 1,
                           .address = reinterpret_cast<uintptr_t>(gates)};
   asm volatile("lidt %0" : : "m"(idt) : "memory");
+  remapPic();
 }
 
 extern "C" void interruptDispatch(const interrupts::Frame* frame) {
