@@ -1,6 +1,7 @@
 #include <kernel/console.hpp>
 #include <kernel/interrupts.hpp>
 #include <kernel/runtime.hpp>
+#include <kernel/io.hpp>
 #include <stddef.h>
 
 namespace {
@@ -75,7 +76,7 @@ extern "C" void loadGdt(const Descriptor* descriptor);
 extern "C" const uintptr_t interruptStubs[256];
 
 void interrupts::initialize() {
-  asm volatile("cli" ::: "memory");
+  io::disableInterrupts();
   task.stacks[0] = reinterpret_cast<uintptr_t>(faultStack + sizeof(faultStack));
   task.ioMap = sizeof(TaskState);
   const uintptr_t address = reinterpret_cast<uintptr_t>(&task);
