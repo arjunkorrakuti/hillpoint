@@ -1,3 +1,4 @@
+#include <cpuid.h>
 #include <kernel/console.hpp>
 #include <kernel/interrupts.hpp>
 #include <kernel/runtime.hpp>
@@ -65,6 +66,14 @@ namespace {
 
   static_assert(sizeof(TaskState) == 104);
   void remapPic() {
+    unsigned int eax, ebx, ecx, edx;
+    __cpuid(1, eax, ebx, ecx, edx);
+    if ((edx & (1U << 9)) != 0) {
+      uint32_t low, high;
+      asm volatile("rdmsr" : "=a"(low), "=d"(high) : "c"(0x1b));
+      low &= ~((1U << 11) | (1U << 10));
+      asm volatile("wrmsr" : : "a"(low), "d"(high), "c"(0x1b) : "memory");
+    }
     io::out(0x20, 0x11);
     io::wait();
     io::out(0xa0, 0x11);
