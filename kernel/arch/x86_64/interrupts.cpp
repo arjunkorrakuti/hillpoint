@@ -94,6 +94,21 @@ namespace {
     io::out(0xa1, 0xff);
   }
 
+  bool spurious(uint8_t irq) {
+    if (irq == 7) {
+      io::out(0x20, 0x0b);
+      return (io::in(0x20) & 0x80) == 0;
+    }
+    if (irq == 15) {
+      io::out(0xa0, 0x0b);
+      if ((io::in(0xa0) & 0x80) == 0) {
+        io::out(0x20, 0x20);
+        return true;
+      }
+    }
+    return false;
+  }
+
   static_assert(sizeof(Gate) == 16);
   static_assert(offsetof(interrupts::Frame, vector) == 15 * 8);
   alignas(16) Gate gates[256] = {};
@@ -136,6 +151,9 @@ void interrupts::initialize() {
 extern "C" void interruptDispatch(const interrupts::Frame* frame) {
   if (frame->vector >= 32 && frame->vector < 48) {
     const uint8_t irq = static_cast<uint8_t>(frame->vector - 32);
+    if (spurious(irq)) {
+      return;
+    }
     __atomic_fetch_add(&counts[irq], 1, __ATOMIC_RELAXED);
     if (handlers[irq] != nullptr) {
       handlers[irq]();
