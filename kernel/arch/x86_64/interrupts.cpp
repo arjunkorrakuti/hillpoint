@@ -98,6 +98,7 @@ namespace {
   static_assert(offsetof(interrupts::Frame, vector) == 15 * 8);
   alignas(16) Gate gates[256] = {};
   interrupts::Handler handlers[16] = {};
+  uint64_t counts[16] = {};
   alignas(16) uint64_t gdt[5] = {0, 0x00af9a000000ffff, 0x00cf92000000ffff, 0, 0};
   alignas(16) TaskState task = {};
   alignas(16) uint8_t faultStack[16384];
@@ -135,6 +136,7 @@ void interrupts::initialize() {
 extern "C" void interruptDispatch(const interrupts::Frame* frame) {
   if (frame->vector >= 32 && frame->vector < 48) {
     const uint8_t irq = static_cast<uint8_t>(frame->vector - 32);
+    __atomic_fetch_add(&counts[irq], 1, __ATOMIC_RELAXED);
     if (handlers[irq] != nullptr) {
       handlers[irq]();
     }
@@ -179,4 +181,8 @@ bool interrupts::registerIrq(uint8_t irq, Handler handler) {
   }
   io::restoreInterrupts(flags);
   return true;
+}
+
+uint64_t interrupts::count(uint8_t irq) {
+  return irq < 16 ? __atomic_load_n(&counts[irq], __ATOMIC_RELAXED) : 0;
 }

@@ -12,4 +12,5 @@ namespace interrupts {
   using Handler = void (*)();
   void initialize();
   bool registerIrq(uint8_t irq, Handler handler);
+  uint64_t count(uint8_t irq);
 }
