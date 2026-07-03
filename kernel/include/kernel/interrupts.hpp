@@ -9,5 +9,7 @@ namespace interrupts {
     uint64_t vector, error, rip, cs, flags, rsp, ss;
   };
 
+  using Handler = void (*)();
   void initialize();
+  bool registerIrq(uint8_t irq, Handler handler);
 }

@@ -97,6 +97,7 @@ namespace {
   static_assert(sizeof(Gate) == 16);
   static_assert(offsetof(interrupts::Frame, vector) == 15 * 8);
   alignas(16) Gate gates[256] = {};
+  interrupts::Handler handlers[16] = {};
   alignas(16) uint64_t gdt[5] = {0, 0x00af9a000000ffff, 0x00cf92000000ffff, 0, 0};
   alignas(16) TaskState task = {};
   alignas(16) uint8_t faultStack[16384];
@@ -132,6 +133,17 @@ void interrupts::initialize() {
 }
 
 extern "C" void interruptDispatch(const interrupts::Frame* frame) {
+  if (frame->vector >= 32 && frame->vector < 48) {
+    const uint8_t irq = static_cast<uint8_t>(frame->vector - 32);
+    if (handlers[irq] != nullptr) {
+      handlers[irq]();
+    }
+    if (irq >= 8) {
+      io::out(0xa0, 0x20);
+    }
+    io::out(0x20, 0x20);
+    return;
+  }
   console::printf("\nException %llu: %s\nRIP=%llx RSP=%llx error=%llx\n",
                   static_cast<unsigned long long>(frame->vector),
                   frame->vector < 32 ? exceptions[frame->vector] : "Unexpected vector",
@@ -148,4 +160,23 @@ extern "C" void interruptDispatch(const interrupts::Frame* frame) {
                     (frame->error & 4) != 0 ? "user" : "kernel");
   }
   panic("Unhandled CPU exception");
+}
+
+bool interrupts::registerIrq(uint8_t irq, Handler handler) {
+  if (irq >= 16 || irq == 2 || handler == nullptr) {
+    return false;
+  }
+  const uint64_t flags = io::disableInterrupts();
+  if (handlers[irq] != nullptr) {
+    io::restoreInterrupts(flags);
+    return false;
+  }
+  handlers[irq] = handler;
+  const uint16_t port = irq < 8 ? 0x21 : 0xa1;
+  io::out(port, static_cast<uint8_t>(io::in(port) & ~(1U << (irq % 8))));
+  if (irq >= 8) {
+    io::out(0x21, static_cast<uint8_t>(io::in(0x21) & ~4U));
+  }
+  io::restoreInterrupts(flags);
+  return true;
 }
