@@ -27,5 +27,7 @@ uint64_t timer::ticks() {
 }
 
 uint64_t timer::milliseconds() {
-  return ticks() * 1000 / frequency;
+  const uint64_t count = ticks();
+  return (count / inputFrequency) * divisor * 1000 +
+         ((count % inputFrequency) * divisor * 1000) / inputFrequency;
 }
