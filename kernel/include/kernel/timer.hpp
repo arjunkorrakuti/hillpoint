@@ -6,4 +6,5 @@ namespace timer {
   constexpr uint32_t frequency = 100;
   void initialize();
   uint64_t ticks();
+  uint64_t milliseconds();
 }

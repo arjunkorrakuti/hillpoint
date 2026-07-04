@@ -26,3 +26,6 @@ uint64_t timer::ticks() {
   return __atomic_load_n(&elapsed, __ATOMIC_RELAXED);
 }
 
+uint64_t timer::milliseconds() {
+  return ticks() * 1000 / frequency;
+}
