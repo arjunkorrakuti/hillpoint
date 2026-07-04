@@ -3,6 +3,7 @@
 #include <kernel/interrupts.hpp>
 #include <kernel/runtime.hpp>
 #include <kernel/serial.hpp>
+#include <kernel/timer.hpp>
 
 extern "C" void kmain() {
   serial::initialize();
@@ -13,5 +14,7 @@ extern "C" void kmain() {
   interrupts::initialize();
   console::write("Hillpoint\nA small x86-64 kernel\n");
   boot::printSummary();
+  timer::initialize();
+  console::printf("PIT timer: approximately %u Hz.\n", timer::frequency);
   halt();
 }
