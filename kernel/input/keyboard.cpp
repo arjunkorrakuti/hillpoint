@@ -10,5 +10,13 @@ namespace {
 }
 
 keyboard::Key keyboard::Decoder::decode(uint8_t code) {
+  if (code == 0xe0) {
+    extended = true;
+    return none;
+  }
+  if (extended) {
+    extended = false;
+    return none;
+  }
   return code < sizeof(normal) ? normal[code] : none;
 }

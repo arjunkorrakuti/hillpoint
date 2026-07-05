@@ -10,5 +10,8 @@ namespace keyboard {
   class Decoder {
    public:
     Key decode(uint8_t code);
+
+   private:
+    bool extended = false;
   };
 }
