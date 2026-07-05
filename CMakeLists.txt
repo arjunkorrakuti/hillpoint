@@ -40,6 +40,7 @@ add_executable(kernel
   kernel/arch/x86_64/interrupts.S
   kernel/arch/x86_64/interrupts.cpp
   kernel/arch/x86_64/timer.cpp
+  kernel/input/keyboard.cpp
 )
 target_include_directories(kernel PRIVATE kernel/include libc/include)
 set_target_properties(kernel PROPERTIES OUTPUT_NAME "hillpoint")
