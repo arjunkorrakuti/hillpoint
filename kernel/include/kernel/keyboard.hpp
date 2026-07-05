@@ -13,5 +13,6 @@ namespace keyboard {
 
    private:
     bool extended = false;
+    uint8_t pauseBytes = 0;
   };
 }

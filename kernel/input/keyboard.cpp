@@ -10,6 +10,16 @@ namespace {
 }
 
 keyboard::Key keyboard::Decoder::decode(uint8_t code) {
+  // Consume unsupported multi-byte keys so their bytes cannot become text
+  if (pauseBytes != 0) {
+    pauseBytes--;
+    return none;
+  }
+  if (code == 0xe1) {
+    pauseBytes = 5;
+    extended = false;
+    return none;
+  }
   if (code == 0xe0) {
     extended = true;
     return none;
