@@ -30,3 +30,22 @@ keyboard::Key keyboard::Decoder::decode(uint8_t code) {
   }
   return code < sizeof(normal) ? normal[code] : none;
 }
+
+bool keyboard::Queue::push(Key key) {
+  const size_t next = (writeIndex + 1) % 128;
+  if (next == readIndex) {
+    return false;
+  }
+  keys[writeIndex] = key;
+  writeIndex = next;
+  return true;
+}
+
+bool keyboard::Queue::pop(Key& key) {
+  if (readIndex == writeIndex) {
+    return false;
+  }
+  key = keys[readIndex];
+  readIndex = (readIndex + 1) % 128;
+  return true;
+}
