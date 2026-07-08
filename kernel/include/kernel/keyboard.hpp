@@ -20,11 +20,13 @@ namespace keyboard {
    public:
     bool push(Key key);
     bool pop(Key& key);
+    size_t dropped() const;
 
    private:
     Key keys[128] = {};
     size_t readIndex = 0;
     size_t writeIndex = 0;
+    size_t lost = 0;
   };
 
 }

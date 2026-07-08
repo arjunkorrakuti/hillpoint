@@ -34,6 +34,7 @@ keyboard::Key keyboard::Decoder::decode(uint8_t code) {
 bool keyboard::Queue::push(Key key) {
   const size_t next = (writeIndex + 1) % 128;
   if (next == readIndex) {
+    lost++;
     return false;
   }
   keys[writeIndex] = key;
@@ -48,4 +49,8 @@ bool keyboard::Queue::pop(Key& key) {
   key = keys[readIndex];
   readIndex = (readIndex + 1) % 128;
   return true;
+}
+
+size_t keyboard::Queue::dropped() const {
+  return lost;
 }
