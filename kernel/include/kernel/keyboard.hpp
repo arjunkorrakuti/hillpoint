@@ -29,4 +29,8 @@ namespace keyboard {
     size_t lost = 0;
   };
 
+
+  bool initialize();
+  bool read(Key& key);
+  size_t dropped();
 }
