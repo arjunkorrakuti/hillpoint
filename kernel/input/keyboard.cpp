@@ -32,25 +32,27 @@ keyboard::Key keyboard::Decoder::decode(uint8_t code) {
 }
 
 bool keyboard::Queue::push(Key key) {
-  const size_t next = (writeIndex + 1) % 128;
-  if (next == readIndex) {
-    lost++;
+  const size_t write = __atomic_load_n(&writeIndex, __ATOMIC_RELAXED);
+  const size_t next = (write + 1) % 128;
+  if (next == __atomic_load_n(&readIndex, __ATOMIC_ACQUIRE)) {
+    __atomic_fetch_add(&lost, 1, __ATOMIC_RELAXED);
     return false;
   }
-  keys[writeIndex] = key;
-  writeIndex = next;
+  keys[write] = key;
+  __atomic_store_n(&writeIndex, next, __ATOMIC_RELEASE);
   return true;
 }
 
 bool keyboard::Queue::pop(Key& key) {
-  if (readIndex == writeIndex) {
+  const size_t read = __atomic_load_n(&readIndex, __ATOMIC_RELAXED);
+  if (read == __atomic_load_n(&writeIndex, __ATOMIC_ACQUIRE)) {
     return false;
   }
-  key = keys[readIndex];
-  readIndex = (readIndex + 1) % 128;
+  key = keys[read];
+  __atomic_store_n(&readIndex, (read + 1) % 128, __ATOMIC_RELEASE);
   return true;
 }
 
 size_t keyboard::Queue::dropped() const {
-  return lost;
+  return __atomic_load_n(&lost, __ATOMIC_RELAXED);
 }
