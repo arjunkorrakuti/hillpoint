@@ -7,12 +7,19 @@ namespace {
   constinit keyboard::Queue queue;
 
   void handle() {
-    if ((io::in(0x64) & 1) == 0) {
-      return;
-    }
-    const keyboard::Key key = decoder.decode(io::in(0x60));
-    if (key != keyboard::none) {
-      queue.push(key);
+    for (size_t count = 0; count < 32; count++) {
+      const uint8_t status = io::in(0x64);
+      if ((status & 1) == 0) {
+        break;
+      }
+      const uint8_t code = io::in(0x60);
+      if ((status & 0xe0) != 0) {
+        continue;
+      }
+      const keyboard::Key key = decoder.decode(code);
+      if (key != keyboard::none) {
+        queue.push(key);
+      }
     }
   }
 }
