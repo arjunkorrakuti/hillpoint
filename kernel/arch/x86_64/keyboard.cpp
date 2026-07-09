@@ -47,6 +47,11 @@ namespace {
     return false;
   }
 
+  bool send(uint8_t value) {
+    uint8_t response;
+    return data(value) && receive(response) && response == 0xfa;
+  }
+
   void handle() {
     for (size_t count = 0; count < 32; count++) {
       const uint8_t status = io::in(0x64);
@@ -85,6 +90,10 @@ bool keyboard::initialize() {
     }
     uint8_t response;
     if (!receive(response) || response != 0 || !command(0xae)) {
+      break;
+    }
+    // Set 2 on the device, translated to set 1 by the controller.
+    if (!send(0xf5) || !send(0xf0) || !send(0x02) || !send(0xf4)) {
       break;
     }
     if (!command(0x60) || !data(static_cast<uint8_t>(config | 1))) {
