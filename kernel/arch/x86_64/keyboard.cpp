@@ -48,8 +48,19 @@ namespace {
   }
 
   bool send(uint8_t value) {
-    uint8_t response;
-    return data(value) && receive(response) && response == 0xfa;
+    for (size_t attempt = 0; attempt < 3; attempt++) {
+      uint8_t response;
+      if (!data(value) || !receive(response)) {
+        return false;
+      }
+      if (response == 0xfa) {
+        return true;
+      }
+      if (response != 0xfe) {
+        return false;
+      }
+    }
+    return false;
   }
 
   void handle() {
