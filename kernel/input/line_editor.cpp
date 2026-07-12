@@ -6,6 +6,9 @@ void LineEditor::clear() {
 }
 
 LineEditor::Action LineEditor::feed(keyboard::Key key) {
+  if (key == '\n') {
+    return Action::submit;
+  }
   if (key >= 32 && key <= 126 && length + 1 < sizeof(line)) {
     line[length++] = static_cast<char>(key);
     line[length] = '\0';
