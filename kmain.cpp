@@ -4,6 +4,7 @@
 #include <kernel/keyboard.hpp>
 #include <kernel/runtime.hpp>
 #include <kernel/serial.hpp>
+#include <kernel/shell.hpp>
 #include <kernel/timer.hpp>
 
 extern "C" void kmain() {
@@ -18,11 +19,5 @@ extern "C" void kmain() {
   timer::initialize();
   console::printf("PIT timer: approximately %u Hz.\n", timer::frequency);
   console::printf("PS/2 keyboard: %s\n", keyboard::initialize() ? "ready" : "unavailable");
-  asm volatile("sti" ::: "memory");
-  while (true) {
-    keyboard::Key key;
-    if (keyboard::read(key)) {
-      console::putchar(static_cast<char>(key));
-    }
-  }
+  shell::run();
 }
