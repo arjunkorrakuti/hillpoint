@@ -1,4 +1,5 @@
 #include <kernel/console.hpp>
+#include <kernel/io.hpp>
 #include <kernel/keyboard.hpp>
 #include <kernel/line_editor.hpp>
 #include <kernel/shell.hpp>
@@ -36,11 +37,14 @@ namespace {
 
 [[noreturn]] void shell::run() {
   prompt();
-  asm volatile("sti" ::: "memory");
   while (true) {
     keyboard::Key key;
+    io::disableInterrupts();
     if (keyboard::read(key)) {
+      asm volatile("sti" ::: "memory");
       accept(key);
+    } else {
+      asm volatile("sti; hlt" ::: "memory");
     }
   }
 }
