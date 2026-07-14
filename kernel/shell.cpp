@@ -3,6 +3,7 @@
 #include <kernel/keyboard.hpp>
 #include <kernel/line_editor.hpp>
 #include <kernel/shell.hpp>
+#include <string.h>
 
 namespace {
   constinit LineEditor editor;
@@ -12,7 +13,11 @@ namespace {
   }
 
   void execute() {
-    console::printf("%s\n", editor.text());
+    if (strcmp(editor.text(), "help") == 0) {
+      console::write("help  List commands\n");
+    } else if (editor.size() != 0) {
+      console::printf("Unknown command: %s. Type help.\n", editor.text());
+    }
   }
 
   void accept(keyboard::Key key) {
