@@ -12,12 +12,55 @@ namespace {
     console::write("hillpoint> ");
   }
 
-  void execute() {
-    if (strcmp(editor.text(), "help") == 0) {
-      console::write("help  List commands\n");
-    } else if (editor.size() != 0) {
-      console::printf("Unknown command: %s. Type help.\n", editor.text());
+  char* token(char*& input) {
+    while (*input == ' ') {
+      input++;
     }
+    char* start = input;
+    while (*input != '\0' && *input != ' ') {
+      input++;
+    }
+    if (*input != '\0') {
+      *input++ = '\0';
+    }
+    while (*input == ' ') {
+      input++;
+    }
+    return start;
+  }
+
+  void help(char*);
+
+  struct Command {
+    const char* name;
+    const char* description;
+    void (*run)(char* arguments);
+  };
+
+  const Command commands[] = {
+    {"help", "List commands", help}};
+
+  void help(char*) {
+    for (const Command& command : commands) {
+      console::printf("%s  %s\n", command.name, command.description);
+    }
+  }
+
+  void execute() {
+    char buffer[256];
+    memcpy(buffer, editor.text(), editor.size() + 1);
+    char* arguments = buffer;
+    const char* name = token(arguments);
+    if (*name == '\0') {
+      return;
+    }
+    for (const Command& command : commands) {
+      if (strcmp(name, command.name) == 0) {
+        command.run(arguments);
+        return;
+      }
+    }
+    console::printf("Unknown command: %s. Type help.\n", name);
   }
 
   void accept(keyboard::Key key) {
