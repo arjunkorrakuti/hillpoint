@@ -29,6 +29,10 @@ namespace {
     return start;
   }
 
+  void echo(char* arguments) {
+    console::printf("%s\n", arguments);
+  }
+
   void help(char*);
 
   struct Command {
@@ -38,6 +42,7 @@ namespace {
   };
 
   const Command commands[] = {
+    {"echo", "Print text", echo},
     {"help", "List commands", help}};
 
   void help(char*) {
