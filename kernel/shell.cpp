@@ -33,6 +33,10 @@ namespace {
     console::printf("%s\n", arguments);
   }
 
+  void clear(char*) {
+    console::clear();
+  }
+
   void help(char*);
 
   struct Command {
@@ -42,6 +46,7 @@ namespace {
   };
 
   const Command commands[] = {
+    {"clear", "Clear the screen", clear},
     {"echo", "Print text", echo},
     {"help", "List commands", help}};
 
