@@ -1,4 +1,5 @@
 #include <kernel/console.hpp>
+#include <kernel/timer.hpp>
 #include <kernel/io.hpp>
 #include <kernel/keyboard.hpp>
 #include <kernel/line_editor.hpp>
@@ -45,6 +46,13 @@ namespace {
       "Type help for commands.\n");
   }
 
+  void uptime(char*) {
+    const uint64_t milliseconds = timer::milliseconds();
+    console::printf("Uptime: %llu ms (%llu PIT ticks)\n",
+                    static_cast<unsigned long long>(milliseconds),
+                    static_cast<unsigned long long>(timer::ticks()));
+  }
+
   void help(char*);
 
   struct Command {
@@ -54,6 +62,7 @@ namespace {
   };
 
   const Command commands[] = {
+    {"uptime", "Time since the PIT started", uptime},
     {"about", "Kernel features and editing keys", about},
     {"clear", "Clear the screen", clear},
     {"echo", "Print text", echo},
