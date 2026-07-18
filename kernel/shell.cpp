@@ -37,6 +37,14 @@ namespace {
     console::clear();
   }
 
+  void about(char*) {
+    console::printf(
+      "Hillpoint: x86-64, C++23, Limine.\n"
+      "Single-core kernel shell; US PS/2 keyboard input.\n"
+      "Type a command, use Backspace to edit, and Enter to run it.\n"
+      "Type help for commands.\n");
+  }
+
   void help(char*);
 
   struct Command {
@@ -46,6 +54,7 @@ namespace {
   };
 
   const Command commands[] = {
+    {"about", "Kernel features and editing keys", about},
     {"clear", "Clear the screen", clear},
     {"echo", "Print text", echo},
     {"help", "List commands", help}};
