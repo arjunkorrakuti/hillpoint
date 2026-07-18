@@ -17,6 +17,10 @@ namespace {
   volatile limine_bootloader_info_request infoRequest = {
     .id = LIMINE_BOOTLOADER_INFO_REQUEST_ID, .revision = 0, .response = nullptr};
 
+  __attribute__((used, section(".limine_requests")))
+  volatile limine_memmap_request memoryRequest = {
+    .id = LIMINE_MEMMAP_REQUEST_ID, .revision = 0, .response = nullptr};
+
   __attribute__((used, section(".limine_requests_end")))
   volatile uint64_t requestsEnd[] = LIMINE_REQUESTS_END_MARKER;
 }
@@ -59,4 +63,19 @@ void boot::printSummary() {
   } else {
     console::printf("Framebuffer unavailable; using serial output.\n");
   }
+  const auto* memory = memoryRequest.response;
+  if (memory == nullptr || memory->entries == nullptr) {
+    console::printf("Memory map unavailable.\n");
+    return;
+  }
+  uint64_t usable = 0;
+  for (uint64_t index = 0; index < memory->entry_count; index++) {
+    const auto* entry = memory->entries[index];
+    if (entry != nullptr && entry->type == LIMINE_MEMMAP_USABLE) {
+      usable += entry->length;
+    }
+  }
+  console::printf("Usable memory: %llu MiB (%llu regions in boot memory map)\n",
+                  static_cast<unsigned long long>(usable / (1024 * 1024)),
+                  static_cast<unsigned long long>(memory->entry_count));
 }
