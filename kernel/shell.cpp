@@ -1,4 +1,5 @@
 #include <kernel/console.hpp>
+#include <kernel/interrupts.hpp>
 #include <kernel/timer.hpp>
 #include <kernel/io.hpp>
 #include <kernel/keyboard.hpp>
@@ -53,6 +54,14 @@ namespace {
                     static_cast<unsigned long long>(timer::ticks()));
   }
 
+  void irq(char*) {
+    console::printf(
+      "IRQ 0 timer: %llu\nIRQ 1 keyboard: %llu\n"
+      "Dropped keys: %zu\n",
+      static_cast<unsigned long long>(interrupts::count(0)),
+      static_cast<unsigned long long>(interrupts::count(1)), keyboard::dropped());
+  }
+
   void help(char*);
 
   struct Command {
@@ -62,6 +71,7 @@ namespace {
   };
 
   const Command commands[] = {
+    {"irq", "Interrupt and input counters", irq},
     {"uptime", "Time since the PIT started", uptime},
     {"about", "Kernel features and editing keys", about},
     {"clear", "Clear the screen", clear},
