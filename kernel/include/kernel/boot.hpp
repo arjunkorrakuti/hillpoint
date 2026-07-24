@@ -14,4 +14,5 @@ namespace boot {
   void printSummary();
   size_t memoryRegions();
   MemoryRegion memoryRegion(size_t index);
+  void* directMap(uint64_t physical);
 }

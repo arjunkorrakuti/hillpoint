@@ -21,6 +21,10 @@ namespace {
   volatile limine_memmap_request memoryRequest = {
     .id = LIMINE_MEMMAP_REQUEST_ID, .revision = 0, .response = nullptr};
 
+  __attribute__((used, section(".limine_requests")))
+  volatile limine_hhdm_request hhdmRequest = {
+    .id = LIMINE_HHDM_REQUEST_ID, .revision = 0, .response = nullptr};
+
   __attribute__((used, section(".limine_requests_end")))
   volatile uint64_t requestsEnd[] = LIMINE_REQUESTS_END_MARKER;
 }
@@ -93,4 +97,12 @@ boot::MemoryRegion boot::memoryRegion(size_t index) {
   return entry != nullptr ? MemoryRegion{entry->base, entry->length,
                                          entry->type == LIMINE_MEMMAP_USABLE}
                           : MemoryRegion{};
+}
+
+void* boot::directMap(uint64_t physical) {
+  const auto* response = hhdmRequest.response;
+  if (response == nullptr || physical > UINT64_MAX - response->offset) {
+    return nullptr;
+  }
+  return reinterpret_cast<void*>(physical + response->offset);
 }
