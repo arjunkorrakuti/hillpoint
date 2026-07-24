@@ -79,3 +79,18 @@ void boot::printSummary() {
                   static_cast<unsigned long long>(usable / (1024 * 1024)),
                   static_cast<unsigned long long>(memory->entry_count));
 }
+
+size_t boot::memoryRegions() {
+  const auto* response = memoryRequest.response;
+  return response != nullptr && response->entries != nullptr ? response->entry_count : 0;
+}
+
+boot::MemoryRegion boot::memoryRegion(size_t index) {
+  if (index >= memoryRegions()) {
+    return {};
+  }
+  const auto* entry = memoryRequest.response->entries[index];
+  return entry != nullptr ? MemoryRegion{entry->base, entry->length,
+                                         entry->type == LIMINE_MEMMAP_USABLE}
+                          : MemoryRegion{};
+}
