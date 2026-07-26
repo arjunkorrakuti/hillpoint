@@ -7,7 +7,9 @@ namespace {
 }
 
 bool memory::PageAllocator::addRegion(void* address, size_t size) {
-  if (address == nullptr || regionCount == 128) {
+  const uintptr_t start = reinterpret_cast<uintptr_t>(address);
+  if (address == nullptr || start % pageSize != 0 ||
+      size > UINTPTR_MAX - start || regionCount == 128) {
     return false;
   }
   const size_t count = size / pageSize;
