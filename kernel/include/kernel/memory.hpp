@@ -1,0 +1,31 @@
+#pragma once
+
+#include <stddef.h>
+#include <stdint.h>
+
+namespace memory {
+  constexpr size_t pageSize = 4096;
+
+  struct PageStats {
+    size_t totalPages;
+    size_t freePages;
+    size_t metadataPages;
+    size_t regions;
+  };
+
+  class PageAllocator {
+   public:
+    bool addRegion(void* address, size_t size);
+
+   private:
+    struct Region {
+      uint8_t* address;
+      size_t pages;
+      size_t metadata;
+    };
+    Region regions[128] = {};
+    size_t regionCount = 0;
+    size_t freePages = 0;
+  };
+
+}

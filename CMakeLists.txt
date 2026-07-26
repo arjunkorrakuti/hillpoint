@@ -44,6 +44,7 @@ add_executable(kernel
   kernel/arch/x86_64/keyboard.cpp
   kernel/input/line_editor.cpp
   kernel/shell.cpp
+  kernel/memory/pages.cpp
 )
 target_include_directories(kernel PRIVATE kernel/include libc/include)
 set_target_properties(kernel PROPERTIES OUTPUT_NAME "hillpoint")
