@@ -30,3 +30,12 @@ bool memory::PageAllocator::addRegion(void* address, size_t size) {
   freePages += count - metadata;
   return true;
 }
+
+memory::PageStats memory::PageAllocator::stats() const {
+  PageStats result = {0, freePages, 0, regionCount};
+  for (size_t index = 0; index < regionCount; index++) {
+    result.totalPages += regions[index].pages;
+    result.metadataPages += regions[index].metadata;
+  }
+  return result;
+}
