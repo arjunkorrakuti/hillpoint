@@ -48,7 +48,9 @@ void* memory::PageAllocator::allocate() {
       if (region.address[page] == available) {
         region.address[page] = head;
         freePages--;
-        return region.address + page * pageSize;
+        void* result = region.address + page * pageSize;
+        memset(result, 0, pageSize);
+        return result;
       }
     }
   }
