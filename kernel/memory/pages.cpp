@@ -56,3 +56,23 @@ void* memory::PageAllocator::allocate() {
   }
   return nullptr;
 }
+
+bool memory::PageAllocator::release(void* address) {
+  const uintptr_t pointer = reinterpret_cast<uintptr_t>(address);
+  for (size_t index = 0; index < regionCount; index++) {
+    Region& region = regions[index];
+    const uintptr_t start = reinterpret_cast<uintptr_t>(region.address);
+    if (pointer < start || pointer - start >= region.pages * pageSize ||
+        (pointer - start) % pageSize != 0) {
+      continue;
+    }
+    size_t page = (pointer - start) / pageSize;
+    if (region.address[page] != head) {
+      return false;
+    }
+    region.address[page] = available;
+    freePages++;
+    return true;
+  }
+  return false;
+}

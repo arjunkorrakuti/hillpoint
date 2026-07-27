@@ -17,6 +17,7 @@ namespace memory {
    public:
     bool addRegion(void* address, size_t size);
     void* allocate();
+    bool release(void* address);
     PageStats stats() const;
 
    private:
