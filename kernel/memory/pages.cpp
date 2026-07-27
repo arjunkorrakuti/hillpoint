@@ -17,6 +17,12 @@ bool memory::PageAllocator::addRegion(void* address, size_t size) {
   if (count <= metadata) {
     return false;
   }
+  for (size_t index = 0; index < regionCount; index++) {
+    const uintptr_t other = reinterpret_cast<uintptr_t>(regions[index].address);
+    if (start < other + regions[index].pages * pageSize && other < start + size) {
+      return false;
+    }
+  }
   auto* bytes = static_cast<uint8_t*>(address);
   memset(bytes, available, count);
   memset(bytes, reserved, metadata);
