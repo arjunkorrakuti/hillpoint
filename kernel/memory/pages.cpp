@@ -3,6 +3,7 @@
 
 namespace {
   constexpr uint8_t available = 0;
+  constexpr uint8_t head = 1;
   constexpr uint8_t reserved = 3;
 }
 
@@ -38,4 +39,18 @@ memory::PageStats memory::PageAllocator::stats() const {
     result.metadataPages += regions[index].metadata;
   }
   return result;
+}
+
+void* memory::PageAllocator::allocate() {
+  for (size_t index = 0; index < regionCount; index++) {
+    Region& region = regions[index];
+    for (size_t page = region.metadata; page < region.pages; page++) {
+      if (region.address[page] == available) {
+        region.address[page] = head;
+        freePages--;
+        return region.address + page * pageSize;
+      }
+    }
+  }
+  return nullptr;
 }

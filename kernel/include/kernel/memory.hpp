@@ -16,6 +16,7 @@ namespace memory {
   class PageAllocator {
    public:
     bool addRegion(void* address, size_t size);
+    void* allocate();
     PageStats stats() const;
 
    private:
