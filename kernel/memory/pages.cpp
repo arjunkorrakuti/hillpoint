@@ -4,6 +4,7 @@
 namespace {
   constexpr uint8_t available = 0;
   constexpr uint8_t head = 1;
+  constexpr uint8_t continuation = 2;
   constexpr uint8_t reserved = 3;
 }
 
@@ -41,15 +42,22 @@ memory::PageStats memory::PageAllocator::stats() const {
   return result;
 }
 
-void* memory::PageAllocator::allocate() {
+void* memory::PageAllocator::allocate(size_t count) {
+  if (count == 0 || count > freePages) {
+    return nullptr;
+  }
   for (size_t index = 0; index < regionCount; index++) {
     Region& region = regions[index];
+    size_t run = 0;
     for (size_t page = region.metadata; page < region.pages; page++) {
-      if (region.address[page] == available) {
-        region.address[page] = head;
-        freePages--;
-        void* result = region.address + page * pageSize;
-        memset(result, 0, pageSize);
+      run = region.address[page] == available ? run + 1 : 0;
+      if (run == count) {
+        const size_t first = page + 1 - count;
+        region.address[first] = head;
+        memset(region.address + first + 1, continuation, count - 1);
+        freePages -= count;
+        void* result = region.address + first * pageSize;
+        memset(result, 0, count * pageSize);
         return result;
       }
     }
@@ -70,8 +78,10 @@ bool memory::PageAllocator::release(void* address) {
     if (region.address[page] != head) {
       return false;
     }
-    region.address[page] = available;
-    freePages++;
+    do {
+      region.address[page++] = available;
+      freePages++;
+    } while (page < region.pages && region.address[page] == continuation);
     return true;
   }
   return false;
