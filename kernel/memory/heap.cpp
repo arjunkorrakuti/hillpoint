@@ -3,8 +3,13 @@
 #include <stdint.h>
 
 bool memory::Heap::initialize(void* address, size_t size) {
-  if (address == nullptr || size < sizeof(Block) + alignof(Block) ||
-      reinterpret_cast<uintptr_t>(address) % alignof(Block) != 0) {
+  if (first != nullptr || address == nullptr ||
+      reinterpret_cast<uintptr_t>(address) % alignof(Block) != 0 ||
+      size > UINTPTR_MAX - reinterpret_cast<uintptr_t>(address)) {
+    return false;
+  }
+  size -= size % alignof(Block);
+  if (size < sizeof(Block) + alignof(Block)) {
     return false;
   }
   first = static_cast<Block*>(address);
