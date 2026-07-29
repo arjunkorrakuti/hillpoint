@@ -31,4 +31,25 @@ namespace memory {
     size_t freePages = 0;
   };
 
+  struct HeapStats {
+    size_t usedBytes;
+    size_t freeBytes;
+    size_t largestFree;
+    size_t allocations;
+  };
+
+  class Heap {
+   public:
+    bool initialize(void* address, size_t size);
+
+   private:
+    struct alignas(16) Block {
+      size_t size;
+      Block* previous;
+      Block* next;
+      bool free;
+    };
+    Block* first = nullptr;
+  };
+
 }
