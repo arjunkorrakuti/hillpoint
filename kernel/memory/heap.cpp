@@ -17,3 +17,19 @@ bool memory::Heap::initialize(void* address, size_t size) {
     .size = size - sizeof(Block), .previous = nullptr, .next = nullptr, .free = true};
   return true;
 }
+
+void* memory::Heap::allocate(size_t size) {
+  constexpr size_t alignment = alignof(Block);
+  if (size == 0 || size > SIZE_MAX - (alignment - 1)) {
+    return nullptr;
+  }
+  size = (size + alignment - 1) & ~(alignment - 1);
+  for (Block* block = first; block != nullptr; block = block->next) {
+    if (!block->free || block->size < size) {
+      continue;
+    }
+    block->free = false;
+    return block + 1;
+  }
+  return nullptr;
+}

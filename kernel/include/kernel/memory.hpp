@@ -41,6 +41,7 @@ namespace memory {
   class Heap {
    public:
     bool initialize(void* address, size_t size);
+    void* allocate(size_t size);
 
    private:
     struct alignas(16) Block {
