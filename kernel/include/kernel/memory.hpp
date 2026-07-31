@@ -52,6 +52,7 @@ namespace memory {
       bool free;
     };
     Block* first = nullptr;
+    void merge(Block* block);
   };
 
 }

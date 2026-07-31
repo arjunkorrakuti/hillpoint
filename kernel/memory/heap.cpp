@@ -59,7 +59,19 @@ bool memory::Heap::release(void* address) {
       return false;
     }
     block->free = true;
+    merge(block);
     return true;
   }
   return false;
+}
+
+void memory::Heap::merge(Block* block) {
+  Block* next = block->next;
+  if (next != nullptr && next->free) {
+    block->size += sizeof(Block) + next->size;
+    block->next = next->next;
+    if (block->next != nullptr) {
+      block->next->previous = block;
+    }
+  }
 }
