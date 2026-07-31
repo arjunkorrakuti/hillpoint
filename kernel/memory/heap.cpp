@@ -46,3 +46,20 @@ void* memory::Heap::allocate(size_t size) {
   }
   return nullptr;
 }
+
+bool memory::Heap::release(void* address) {
+  if (address == nullptr) {
+    return true;
+  }
+  for (Block* block = first; block != nullptr; block = block->next) {
+    if (block + 1 != address) {
+      continue;
+    }
+    if (block->free) {
+      return false;
+    }
+    block->free = true;
+    return true;
+  }
+  return false;
+}

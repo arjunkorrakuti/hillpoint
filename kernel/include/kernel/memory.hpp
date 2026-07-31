@@ -42,6 +42,7 @@ namespace memory {
    public:
     bool initialize(void* address, size_t size);
     void* allocate(size_t size);
+    bool release(void* address);
 
    private:
     struct alignas(16) Block {
