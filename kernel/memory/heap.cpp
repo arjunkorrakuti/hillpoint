@@ -28,6 +28,19 @@ void* memory::Heap::allocate(size_t size) {
     if (!block->free || block->size < size) {
       continue;
     }
+    if (block->size - size >= sizeof(Block) + alignment) {
+      auto* remainder =
+        reinterpret_cast<Block*>(reinterpret_cast<uint8_t*>(block + 1) + size);
+      *remainder = {.size = block->size - size - sizeof(Block),
+                    .previous = block,
+                    .next = block->next,
+                    .free = true};
+      if (remainder->next != nullptr) {
+        remainder->next->previous = remainder;
+      }
+      block->next = remainder;
+      block->size = size;
+    }
     block->free = false;
     return block + 1;
   }
