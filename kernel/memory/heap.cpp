@@ -60,6 +60,9 @@ bool memory::Heap::release(void* address) {
     }
     block->free = true;
     merge(block);
+    if (block->previous != nullptr && block->previous->free) {
+      merge(block->previous);
+    }
     return true;
   }
   return false;
