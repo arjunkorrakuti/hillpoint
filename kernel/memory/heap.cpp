@@ -78,3 +78,15 @@ void memory::Heap::merge(Block* block) {
     }
   }
 }
+
+memory::HeapStats memory::Heap::stats() const {
+  HeapStats result = {};
+  for (const Block* block = first; block != nullptr; block = block->next) {
+    if (block->free) {
+      result.freeBytes += block->size;
+    } else {
+      result.usedBytes += block->size;
+    }
+  }
+  return result;
+}
