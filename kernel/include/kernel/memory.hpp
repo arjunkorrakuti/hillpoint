@@ -15,6 +15,9 @@ namespace memory {
 
   class PageAllocator {
    public:
+    PageAllocator() = default;
+    PageAllocator(const PageAllocator&) = delete;
+    PageAllocator& operator=(const PageAllocator&) = delete;
     bool addRegion(void* address, size_t size);
     void* allocate(size_t count = 1);
     bool release(void* address);
@@ -40,6 +43,9 @@ namespace memory {
 
   class Heap {
    public:
+    Heap() = default;
+    Heap(const Heap&) = delete;
+    Heap& operator=(const Heap&) = delete;
     bool initialize(void* address, size_t size);
     void* allocate(size_t size);
     bool release(void* address);
