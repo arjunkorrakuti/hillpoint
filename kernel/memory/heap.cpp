@@ -84,8 +84,12 @@ memory::HeapStats memory::Heap::stats() const {
   for (const Block* block = first; block != nullptr; block = block->next) {
     if (block->free) {
       result.freeBytes += block->size;
+      if (block->size > result.largestFree) {
+        result.largestFree = block->size;
+      }
     } else {
       result.usedBytes += block->size;
+      result.allocations++;
     }
   }
   return result;
