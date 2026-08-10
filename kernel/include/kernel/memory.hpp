@@ -62,4 +62,7 @@ namespace memory {
     void merge(Block* block);
   };
 
+  bool initialize();
+  PageAllocator& pages();
+  Heap& heap();
 }
