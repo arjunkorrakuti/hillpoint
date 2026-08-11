@@ -24,8 +24,13 @@ bool memory::initialize() {
       return false;
     }
   }
-  void* arena = allocator.allocate(256);
-  return arena != nullptr && kernelHeap.initialize(arena, 256 * pageSize);
+  for (size_t count = 256; count >= 16; count /= 2) {
+    void* arena = allocator.allocate(count);
+    if (arena != nullptr) {
+      return kernelHeap.initialize(arena, count * pageSize);
+    }
+  }
+  return false;
 }
 
 memory::PageAllocator& memory::pages() {
