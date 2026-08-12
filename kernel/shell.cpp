@@ -4,6 +4,7 @@
 #include <kernel/io.hpp>
 #include <kernel/keyboard.hpp>
 #include <kernel/line_editor.hpp>
+#include <kernel/memory.hpp>
 #include <kernel/runtime.hpp>
 #include <kernel/shell.hpp>
 #include <string.h>
@@ -68,6 +69,13 @@ namespace {
     halt();
   }
 
+  void mem(char*) {
+    const memory::PageStats pages = memory::pages().stats();
+    console::printf("Pages: %zu free / %zu managed; %zu metadata pages, %zu regions\n",
+                    pages.freePages, pages.totalPages, pages.metadataPages,
+                    pages.regions);
+  }
+
   void help(char*);
 
   struct Command {
@@ -77,6 +85,7 @@ namespace {
   };
 
   const Command commands[] = {
+    {"mem", "Physical page and heap statistics", mem},
     {"halt", "Stop the CPU", stop},
     {"irq", "Interrupt and input counters", irq},
     {"uptime", "Time since the PIT started", uptime},
