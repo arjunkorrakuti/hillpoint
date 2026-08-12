@@ -11,6 +11,7 @@
 
 namespace {
   constinit LineEditor editor;
+  void* allocations[16] = {};
 
   void prompt() {
     console::write("hillpoint> ");
@@ -79,6 +80,45 @@ namespace {
                     heap.usedBytes, heap.freeBytes, heap.largestFree, heap.allocations);
   }
 
+  bool number(const char* text, size_t& value) {
+    value = 0;
+    if (*text == '\0') {
+      return false;
+    }
+    while (*text != '\0') {
+      if (*text < '0' || *text > '9') {
+        return false;
+      }
+      const size_t digit = static_cast<size_t>(*text++ - '0');
+      if (value > (SIZE_MAX - digit) / 10) {
+        return false;
+      }
+      value = value * 10 + digit;
+    }
+    return true;
+  }
+
+  void alloc(char* arguments) {
+    size_t size;
+    if (!number(arguments, size) || size == 0) {
+      console::printf("Usage: alloc <bytes>\n");
+      return;
+    }
+    for (size_t slot = 0; slot < 16; slot++) {
+      if (allocations[slot] == nullptr) {
+        allocations[slot] = memory::heap().allocate(size);
+        if (allocations[slot] == nullptr) {
+          console::printf("Allocation failed: insufficient contiguous heap space.\n");
+        } else {
+          console::printf("Allocated slot %zu: %zu bytes at %p\n", slot, size,
+                          allocations[slot]);
+        }
+        return;
+      }
+    }
+    console::printf("All 16 demo slots are occupied. Free one first.\n");
+  }
+
   void help(char*);
 
   struct Command {
@@ -88,6 +128,7 @@ namespace {
   };
 
   const Command commands[] = {
+    {"alloc", "alloc <bytes>: allocate a demo heap block", alloc},
     {"mem", "Physical page and heap statistics", mem},
     {"halt", "Stop the CPU", stop},
     {"irq", "Interrupt and input counters", irq},
