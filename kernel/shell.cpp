@@ -71,9 +71,12 @@ namespace {
 
   void mem(char*) {
     const memory::PageStats pages = memory::pages().stats();
+    const memory::HeapStats heap = memory::heap().stats();
     console::printf("Pages: %zu free / %zu managed; %zu metadata pages, %zu regions\n",
                     pages.freePages, pages.totalPages, pages.metadataPages,
                     pages.regions);
+    console::printf("Heap: %zu used, %zu free, %zu largest free, %zu allocations\n",
+                    heap.usedBytes, heap.freeBytes, heap.largestFree, heap.allocations);
   }
 
   void help(char*);
