@@ -110,6 +110,7 @@ namespace {
         if (allocations[slot] == nullptr) {
           console::printf("Allocation failed: insufficient contiguous heap space.\n");
         } else {
+          memset(allocations[slot], 0xa5, size);
           console::printf("Allocated slot %zu: %zu bytes at %p\n", slot, size,
                           allocations[slot]);
         }
