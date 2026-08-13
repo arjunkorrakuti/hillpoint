@@ -47,6 +47,7 @@ add_executable(kernel
   kernel/memory/pages.cpp
   kernel/memory/heap.cpp
   kernel/memory/memory.cpp
+  kernel/ramfs.cpp
 )
 target_include_directories(kernel PRIVATE kernel/include libc/include)
 set_target_properties(kernel PROPERTIES OUTPUT_NAME "hillpoint")
