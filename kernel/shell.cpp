@@ -119,6 +119,19 @@ namespace {
     console::printf("All 16 demo slots are occupied. Free one first.\n");
   }
 
+  void release(char* arguments) {
+    size_t slot;
+    if (!number(arguments, slot) || slot >= 16 || allocations[slot] == nullptr) {
+      console::printf("Usage: free <occupied slot 0-15>\n");
+      return;
+    }
+    if (!memory::heap().release(allocations[slot])) {
+      panic("Invalid shell allocation");
+    }
+    allocations[slot] = nullptr;
+    console::printf("Freed slot %zu.\n", slot);
+  }
+
   void help(char*);
 
   struct Command {
@@ -128,6 +141,7 @@ namespace {
   };
 
   const Command commands[] = {
+    {"free", "free <slot>: release a demo heap block", release},
     {"alloc", "alloc <bytes>: allocate a demo heap block", alloc},
     {"mem", "Physical page and heap statistics", mem},
     {"halt", "Stop the CPU", stop},
