@@ -17,6 +17,7 @@ namespace ramfs {
    public:
     void initialize(memory::Heap& allocator);
     Result create(const char* name, const char* data, size_t size);
+    const File* find(const char* name) const;
 
    private:
     memory::Heap* heap = nullptr;

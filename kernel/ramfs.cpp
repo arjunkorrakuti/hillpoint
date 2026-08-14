@@ -39,3 +39,12 @@ ramfs::Result ramfs::Store::create(const char* name, const char* data, size_t si
   slot->size = size;
   return Result::ok;
 }
+
+const ramfs::File* ramfs::Store::find(const char* name) const {
+  for (const File& file : files) {
+    if (file.data != nullptr && strcmp(file.name, name) == 0) {
+      return &file;
+    }
+  }
+  return nullptr;
+}
