@@ -16,6 +16,7 @@ namespace ramfs {
   class Store {
    public:
     void initialize(memory::Heap& allocator);
+    Result create(const char* name, const char* data, size_t size);
 
    private:
     memory::Heap* heap = nullptr;
