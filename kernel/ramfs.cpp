@@ -48,3 +48,23 @@ const ramfs::File* ramfs::Store::find(const char* name) const {
   }
   return nullptr;
 }
+
+const char* ramfs::message(Result result) {
+  switch (result) {
+    case Result::exists:
+      return "File already exists.";
+    case Result::ok:
+      return "ok";
+    case Result::invalidName:
+      return "Use a name of 1-31 letters, digits, dots, - or _.";
+    case Result::full:
+      return "File limit reached (16).";
+    case Result::noMemory:
+      return "Out of heap memory; existing file preserved.";
+    case Result::tooLarge:
+      return "File exceeds 256 bytes.";
+    case Result::notFound:
+      return "File not found.";
+  }
+  return "Unknown file error.";
+}

@@ -24,4 +24,5 @@ namespace ramfs {
     File files[maxFiles] = {};
   };
 
+  const char* message(Result result);
 }
