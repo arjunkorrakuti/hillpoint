@@ -5,12 +5,14 @@
 #include <kernel/keyboard.hpp>
 #include <kernel/line_editor.hpp>
 #include <kernel/memory.hpp>
+#include <kernel/ramfs.hpp>
 #include <kernel/runtime.hpp>
 #include <kernel/shell.hpp>
 #include <string.h>
 
 namespace {
   constinit LineEditor editor;
+  constinit ramfs::Store files;
   void* allocations[16] = {};
 
   void prompt() {
@@ -133,6 +135,18 @@ namespace {
     console::printf("Freed slot %zu.\n", slot);
   }
 
+  void ls(char*) {
+    size_t count = 0;
+    for (size_t index = 0; index < ramfs::maxFiles; index++) {
+      const ramfs::File* file = files.entry(index);
+      if (file != nullptr) {
+        console::printf("%s\n", file->name);
+        count++;
+      }
+    }
+    console::printf("%zu file(s), RAM only.\n", count);
+  }
+
   void help(char*);
 
   struct Command {
@@ -142,6 +156,7 @@ namespace {
   };
 
   const Command commands[] = {
+    {"ls", "List RAM files", ls},
     {"free", "free <slot>: release a demo heap block", release},
     {"alloc", "alloc <bytes>: allocate a demo heap block", alloc},
     {"mem", "Physical page and heap statistics", mem},
@@ -197,6 +212,7 @@ namespace {
 }
 
 [[noreturn]] void shell::run() {
+  files.initialize(memory::heap());
   prompt();
   while (true) {
     keyboard::Key key;
