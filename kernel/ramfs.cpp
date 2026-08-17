@@ -68,3 +68,7 @@ const char* ramfs::message(Result result) {
   }
   return "Unknown file error.";
 }
+
+const ramfs::File* ramfs::Store::entry(size_t index) const {
+  return index < maxFiles && files[index].data != nullptr ? &files[index] : nullptr;
+}
