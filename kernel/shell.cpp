@@ -147,6 +147,12 @@ namespace {
     console::printf("%zu file(s), RAM only.\n", count);
   }
 
+  void write(char* arguments) {
+    char* name = token(arguments);
+    const ramfs::Result result = files.create(name, arguments, strlen(arguments));
+    console::printf("%s\n", ramfs::message(result));
+  }
+
   void help(char*);
 
   struct Command {
@@ -156,6 +162,7 @@ namespace {
   };
 
   const Command commands[] = {
+    {"write", "write <name> [text]: create a RAM file", write},
     {"ls", "List RAM files", ls},
     {"free", "free <slot>: release a demo heap block", release},
     {"alloc", "alloc <bytes>: allocate a demo heap block", alloc},
