@@ -153,6 +153,16 @@ namespace {
     console::printf("%s\n", ramfs::message(result));
   }
 
+  void cat(char* arguments) {
+    const ramfs::File* file = files.find(arguments);
+    if (file == nullptr) {
+      console::printf("File not found.\n");
+      return;
+    }
+    console::write(file->data, file->size);
+    console::putchar('\n');
+  }
+
   void help(char*);
 
   struct Command {
@@ -162,6 +172,7 @@ namespace {
   };
 
   const Command commands[] = {
+    {"cat", "cat <name>: print a RAM file", cat},
     {"write", "write <name> [text]: create a RAM file", write},
     {"ls", "List RAM files", ls},
     {"free", "free <slot>: release a demo heap block", release},
