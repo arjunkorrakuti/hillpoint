@@ -72,3 +72,14 @@ const char* ramfs::message(Result result) {
 const ramfs::File* ramfs::Store::entry(size_t index) const {
   return index < maxFiles && files[index].data != nullptr ? &files[index] : nullptr;
 }
+
+ramfs::Result ramfs::Store::remove(const char* name) {
+  for (File& file : files) {
+    if (file.data != nullptr && strcmp(file.name, name) == 0) {
+      heap->release(file.data);
+      file = {};
+      return Result::ok;
+    }
+  }
+  return Result::notFound;
+}
