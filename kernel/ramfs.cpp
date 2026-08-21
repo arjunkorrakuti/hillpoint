@@ -4,7 +4,7 @@
 namespace {
   bool validName(const char* name) {
     const size_t size = strlen(name);
-    if (size == 0 || size >= 32) {
+    if (size == 0 || size >= 32 || strcmp(name, ".") == 0 || strcmp(name, "..") == 0) {
       return false;
     }
     for (size_t index = 0; index < size; index++) {
