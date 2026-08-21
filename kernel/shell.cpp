@@ -163,6 +163,10 @@ namespace {
     console::putchar('\n');
   }
 
+  void rm(char* arguments) {
+    console::printf("%s\n", ramfs::message(files.remove(arguments)));
+  }
+
   void help(char*);
 
   struct Command {
@@ -172,6 +176,7 @@ namespace {
   };
 
   const Command commands[] = {
+    {"rm", "rm <name>: delete a RAM file", rm},
     {"cat", "cat <name>: print a RAM file", cat},
     {"write", "write <name> [text]: create a RAM file", write},
     {"ls", "List RAM files", ls},
