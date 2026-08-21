@@ -1,6 +1,25 @@
 #include <kernel/ramfs.hpp>
 #include <string.h>
 
+namespace {
+  bool validName(const char* name) {
+    const size_t size = strlen(name);
+    if (size == 0 || size >= 32) {
+      return false;
+    }
+    for (size_t index = 0; index < size; index++) {
+      const char character = name[index];
+      if (!((character >= 'a' && character <= 'z') ||
+            (character >= 'A' && character <= 'Z') ||
+            (character >= '0' && character <= '9') ||
+            character == '.' || character == '-' || character == '_')) {
+        return false;
+      }
+    }
+    return true;
+  }
+}
+
 void ramfs::Store::initialize(memory::Heap& allocator) {
   if (heap == nullptr) {
     heap = &allocator;
@@ -9,7 +28,7 @@ void ramfs::Store::initialize(memory::Heap& allocator) {
 
 ramfs::Result ramfs::Store::create(const char* name, const char* data, size_t size) {
   const size_t length = strlen(name);
-  if (length == 0 || length >= 32) {
+  if (!validName(name)) {
     return Result::invalidName;
   }
   if (size > maxFileSize) {
