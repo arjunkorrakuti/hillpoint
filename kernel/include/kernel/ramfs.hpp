@@ -5,7 +5,7 @@
 namespace ramfs {
   constexpr size_t maxFiles = 16;
   constexpr size_t maxFileSize = 256;
-  enum class Result { ok, invalidName, full, noMemory, tooLarge, notFound, exists };
+  enum class Result { ok, invalidName, full, noMemory, tooLarge, notFound };
 
   struct File {
     char name[32];
@@ -16,7 +16,7 @@ namespace ramfs {
   class Store {
    public:
     void initialize(memory::Heap& allocator);
-    Result create(const char* name, const char* data, size_t size);
+    Result write(const char* name, const char* data, size_t size);
     Result remove(const char* name);
     const File* find(const char* name) const;
     const File* entry(size_t index) const;

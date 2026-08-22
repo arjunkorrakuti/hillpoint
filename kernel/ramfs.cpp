@@ -26,8 +26,7 @@ void ramfs::Store::initialize(memory::Heap& allocator) {
   }
 }
 
-ramfs::Result ramfs::Store::create(const char* name, const char* data, size_t size) {
-  const size_t length = strlen(name);
+ramfs::Result ramfs::Store::write(const char* name, const char* data, size_t size) {
   if (!validName(name)) {
     return Result::invalidName;
   }
@@ -37,7 +36,8 @@ ramfs::Result ramfs::Store::create(const char* name, const char* data, size_t si
   File* slot = nullptr;
   for (File& file : files) {
     if (file.data != nullptr && strcmp(file.name, name) == 0) {
-      return Result::exists;
+      slot = &file;
+      break;
     }
     if (file.data == nullptr && slot == nullptr) {
       slot = &file;
@@ -46,15 +46,16 @@ ramfs::Result ramfs::Store::create(const char* name, const char* data, size_t si
   if (slot == nullptr) {
     return Result::full;
   }
-  auto* contents = heap != nullptr ? static_cast<char*>(heap->allocate(size + 1))
-                                  : nullptr;
-  if (contents == nullptr) {
+  auto* replacement = heap != nullptr ? static_cast<char*>(heap->allocate(size + 1))
+                                     : nullptr;
+  if (replacement == nullptr) {
     return Result::noMemory;
   }
-  memcpy(contents, data, size);
-  contents[size] = '\0';
-  memcpy(slot->name, name, length + 1);
-  slot->data = contents;
+  memcpy(replacement, data, size);
+  replacement[size] = '\0';
+  heap->release(slot->data);
+  memcpy(slot->name, name, strlen(name) + 1);
+  slot->data = replacement;
   slot->size = size;
   return Result::ok;
 }
@@ -70,8 +71,6 @@ const ramfs::File* ramfs::Store::find(const char* name) const {
 
 const char* ramfs::message(Result result) {
   switch (result) {
-    case Result::exists:
-      return "File already exists.";
     case Result::ok:
       return "ok";
     case Result::invalidName:

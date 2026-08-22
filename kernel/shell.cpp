@@ -149,7 +149,7 @@ namespace {
 
   void write(char* arguments) {
     char* name = token(arguments);
-    const ramfs::Result result = files.create(name, arguments, strlen(arguments));
+    const ramfs::Result result = files.write(name, arguments, strlen(arguments));
     console::printf("%s\n", ramfs::message(result));
   }
 
@@ -178,7 +178,7 @@ namespace {
   const Command commands[] = {
     {"rm", "rm <name>: delete a RAM file", rm},
     {"cat", "cat <name>: print a RAM file", cat},
-    {"write", "write <name> [text]: create a RAM file", write},
+    {"write", "write <name> [text]: create or replace a RAM file", write},
     {"ls", "List RAM files", ls},
     {"free", "free <slot>: release a demo heap block", release},
     {"alloc", "alloc <bytes>: allocate a demo heap block", alloc},
