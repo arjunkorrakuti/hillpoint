@@ -3,7 +3,7 @@
 #include <kernel/memory.hpp>
 
 namespace ramfs {
-  constexpr size_t maxFiles = 16;
+  constexpr size_t maxFiles = 32;
   constexpr size_t maxFileSize = 4096;
   enum class Result { ok, invalidName, full, noMemory, tooLarge, notFound };
 

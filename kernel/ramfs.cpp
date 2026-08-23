@@ -76,7 +76,7 @@ const char* ramfs::message(Result result) {
     case Result::invalidName:
       return "Use a name of 1-31 letters, digits, dots, - or _.";
     case Result::full:
-      return "File limit reached (16).";
+      return "File limit reached (32).";
     case Result::noMemory:
       return "Out of heap memory; existing file preserved.";
     case Result::tooLarge:
