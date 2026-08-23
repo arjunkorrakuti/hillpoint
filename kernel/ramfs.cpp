@@ -80,7 +80,7 @@ const char* ramfs::message(Result result) {
     case Result::noMemory:
       return "Out of heap memory; existing file preserved.";
     case Result::tooLarge:
-      return "File exceeds 256 bytes.";
+      return "File exceeds 4096 bytes.";
     case Result::notFound:
       return "File not found.";
   }
