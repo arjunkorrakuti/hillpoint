@@ -140,7 +140,7 @@ namespace {
     for (size_t index = 0; index < ramfs::maxFiles; index++) {
       const ramfs::File* file = files.entry(index);
       if (file != nullptr) {
-        console::printf("%s\n", file->name);
+        console::printf("%zu  %s\n", file->size, file->name);
         count++;
       }
     }
