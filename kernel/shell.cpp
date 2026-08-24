@@ -49,7 +49,7 @@ namespace {
       "Hillpoint: x86-64, C++23, Limine.\n"
       "Single-core kernel shell; US PS/2 keyboard input.\n"
       "Type a command, use Backspace to edit, and Enter to run it.\n"
-      "Type help for commands.\n");
+      "RAM files disappear on reboot. Type help for commands.\n");
   }
 
   void uptime(char*) {
@@ -240,6 +240,7 @@ namespace {
 
 [[noreturn]] void shell::run() {
   files.initialize(memory::heap());
+  console::printf("Type help for commands. Files are stored in RAM only.\n");
   prompt();
   while (true) {
     keyboard::Key key;
