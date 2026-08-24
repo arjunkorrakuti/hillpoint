@@ -149,6 +149,10 @@ namespace {
 
   void write(char* arguments) {
     char* name = token(arguments);
+    if (*name == '\0') {
+      console::printf("Usage: write <name> [text]\n");
+      return;
+    }
     const ramfs::Result result = files.write(name, arguments, strlen(arguments));
     console::printf("%s\n", ramfs::message(result));
   }
