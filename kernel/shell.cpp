@@ -10,6 +10,7 @@
 #include <kernel/shell.hpp>
 #include <string.h>
 
+extern "C" [[noreturn]] void triggerDoubleFault();
 namespace {
   constinit LineEditor editor;
   constinit ramfs::Store files;
@@ -171,6 +172,14 @@ namespace {
     console::printf("%s\n", ramfs::message(files.remove(arguments)));
   }
 
+  void fault(char* arguments) {
+    if (strcmp(arguments, "invalid") == 0) {
+      asm volatile("ud2");
+    } else {
+      console::printf("Usage: fault invalid (intentional fatal exception)\n");
+    }
+  }
+
   void help(char*);
 
   struct Command {
@@ -180,6 +189,7 @@ namespace {
   };
 
   const Command commands[] = {
+    {"fault", "fault invalid: demonstrate a fatal exception", fault},
     {"rm", "rm <name>: delete a RAM file", rm},
     {"cat", "cat <name>: print a RAM file", cat},
     {"write", "write <name> [text]: create or replace a RAM file", write},
