@@ -240,6 +240,8 @@ namespace {
 
 [[noreturn]] void shell::run() {
   files.initialize(memory::heap());
+  constexpr char welcome[] = "Welcome to Hillpoint. Try help, mem, and uptime.";
+  files.write("readme", welcome, sizeof(welcome) - 1);
   console::printf("Type help for commands. Files are stored in RAM only.\n");
   prompt();
   while (true) {
