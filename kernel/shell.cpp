@@ -177,9 +177,11 @@ namespace {
       asm volatile("ud2");
     } else if (strcmp(arguments, "page") == 0) {
       asm volatile("movq $0x1000, %%rax; movq (%%rax), %%rax" : : : "rax", "memory");
+    } else if (strcmp(arguments, "double") == 0) {
+      triggerDoubleFault();
     } else {
       console::printf(
-        "Usage: fault invalid|page (intentional fatal exception)\n");
+        "Usage: fault invalid|page|double (intentional fatal exception)\n");
     }
   }
 
@@ -192,7 +194,7 @@ namespace {
   };
 
   const Command commands[] = {
-    {"fault", "fault invalid|page: demonstrate a fatal exception", fault},
+    {"fault", "fault invalid|page|double: demonstrate a fatal exception", fault},
     {"rm", "rm <name>: delete a RAM file", rm},
     {"cat", "cat <name>: print a RAM file", cat},
     {"write", "write <name> [text]: create or replace a RAM file", write},

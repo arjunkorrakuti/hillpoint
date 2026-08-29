@@ -20,6 +20,15 @@ loadGdt:
   ret
 .size loadGdt, .-loadGdt
 
+.global triggerDoubleFault
+.type triggerDoubleFault, @function
+triggerDoubleFault:
+  # An unmapped stack prevents delivery of the initial page fault.
+  movq $0x1000, %rsp
+  pushq $0
+  ud2
+.size triggerDoubleFault, .-triggerDoubleFault
+
 .altmacro
 .macro stub number
 .type interrupt\number, @function
