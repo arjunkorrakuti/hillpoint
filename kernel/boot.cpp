@@ -33,6 +33,29 @@ bool boot::supported() {
   return LIMINE_BASE_REVISION_SUPPORTED(baseRevision);
 }
 
+size_t boot::memoryRegions() {
+  const auto* response = memoryRequest.response;
+  return response != nullptr && response->entries != nullptr ? response->entry_count : 0;
+}
+
+boot::MemoryRegion boot::memoryRegion(size_t index) {
+  if (index >= memoryRegions()) {
+    return {};
+  }
+  const auto* entry = memoryRequest.response->entries[index];
+  return entry != nullptr ? MemoryRegion{entry->base, entry->length,
+                                         entry->type == LIMINE_MEMMAP_USABLE}
+                          : MemoryRegion{};
+}
+
+void* boot::directMap(uint64_t physical) {
+  const auto* response = hhdmRequest.response;
+  if (response == nullptr || physical > UINT64_MAX - response->offset) {
+    return nullptr;
+  }
+  return reinterpret_cast<void*>(physical + response->offset);
+}
+
 Framebuffer boot::framebuffer() {
   const auto* response = framebufferRequest.response;
   if (response == nullptr || response->framebuffer_count == 0 ||
@@ -82,27 +105,4 @@ void boot::printSummary() {
   console::printf("Usable memory: %llu MiB (%llu regions in boot memory map)\n",
                   static_cast<unsigned long long>(usable / (1024 * 1024)),
                   static_cast<unsigned long long>(memory->entry_count));
-}
-
-size_t boot::memoryRegions() {
-  const auto* response = memoryRequest.response;
-  return response != nullptr && response->entries != nullptr ? response->entry_count : 0;
-}
-
-boot::MemoryRegion boot::memoryRegion(size_t index) {
-  if (index >= memoryRegions()) {
-    return {};
-  }
-  const auto* entry = memoryRequest.response->entries[index];
-  return entry != nullptr ? MemoryRegion{entry->base, entry->length,
-                                         entry->type == LIMINE_MEMMAP_USABLE}
-                          : MemoryRegion{};
-}
-
-void* boot::directMap(uint64_t physical) {
-  const auto* response = hhdmRequest.response;
-  if (response == nullptr || physical > UINT64_MAX - response->offset) {
-    return nullptr;
-  }
-  return reinterpret_cast<void*>(physical + response->offset);
 }
