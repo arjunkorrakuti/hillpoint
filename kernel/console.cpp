@@ -21,10 +21,6 @@ namespace {
     }
   }
 
-  void output(char character, void*) {
-    console::putchar(character);
-  }
-
   void draw(char character) {
     for (size_t y = 0; y < font::height; y++) {
       for (size_t x = 0; x < font::width; x++) {
@@ -33,6 +29,10 @@ namespace {
                         filled ? foreground : background);
       }
     }
+  }
+
+  void output(char character, void*) {
+    console::putchar(character);
   }
 }
 
@@ -48,6 +48,12 @@ bool console::initialize(const Framebuffer& framebuffer) {
   rows = graphics::height() / font::height;
   clear();
   return columns != 0 && rows != 0;
+}
+
+void console::clear() {
+  graphics::clear(background);
+  column = 0;
+  row = 0;
 }
 
 void console::putchar(char character) {
@@ -92,12 +98,6 @@ void console::write(const char* string, size_t size) {
 
 void console::write(const char* string) {
   write(string, strlen(string));
-}
-
-void console::clear() {
-  graphics::clear(background);
-  column = 0;
-  row = 0;
 }
 
 size_t console::vprintf(const char* pattern, va_list arguments) {
