@@ -17,13 +17,12 @@ struct Framebuffer {
   uint8_t blueShift;
 };
 
-
 namespace graphics {
   bool supported(const Framebuffer& framebuffer);
   bool initialize(const Framebuffer& framebuffer);
   size_t width();
   size_t height();
-  void scroll(size_t rows, uint32_t color);
-  void clear(uint32_t color);
   void pixel(size_t x, size_t y, uint32_t color);
+  void clear(uint32_t color);
+  void scroll(size_t rows, uint32_t color);
 }

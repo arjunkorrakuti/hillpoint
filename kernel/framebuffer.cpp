@@ -3,27 +3,15 @@
 namespace {
   Framebuffer screen = {};
 
-  volatile uint32_t* row(size_t y) {
-    auto* address = static_cast<uint8_t*>(screen.address);
-    return reinterpret_cast<volatile uint32_t*>(address + y * screen.pitch);
-  }
-
   uint32_t encode(uint32_t color) {
     return (((color >> 16) & 0xff) << screen.redShift) |
            (((color >> 8) & 0xff) << screen.greenShift) |
            ((color & 0xff) << screen.blueShift);
   }
-}
 
-bool graphics::initialize(const Framebuffer& framebuffer) {
-  const bool valid = supported(framebuffer);
-  screen = valid ? framebuffer : Framebuffer{};
-  return valid;
-}
-
-void graphics::pixel(size_t x, size_t y, uint32_t color) {
-  if (x < screen.width && y < screen.height) {
-    row(y)[x] = encode(color);
+  volatile uint32_t* row(size_t y) {
+    auto* address = static_cast<uint8_t*>(screen.address);
+    return reinterpret_cast<volatile uint32_t*>(address + y * screen.pitch);
   }
 }
 
@@ -45,6 +33,12 @@ bool graphics::supported(const Framebuffer& framebuffer) {
   return (red & green) == 0 && (red & blue) == 0 && (green & blue) == 0;
 }
 
+bool graphics::initialize(const Framebuffer& framebuffer) {
+  const bool valid = supported(framebuffer);
+  screen = valid ? framebuffer : Framebuffer{};
+  return valid;
+}
+
 size_t graphics::width() {
   return screen.width;
 }
@@ -53,12 +47,14 @@ size_t graphics::height() {
   return screen.height;
 }
 
-void graphics::clear(uint32_t color) {
-  for (size_t y = 0; y < screen.height; y++) {
-    for (size_t x = 0; x < screen.width; x++) {
-      pixel(x, y, color);
-    }
+void graphics::pixel(size_t x, size_t y, uint32_t color) {
+  if (x < screen.width && y < screen.height) {
+    row(y)[x] = encode(color);
   }
+}
+
+void graphics::clear(uint32_t color) {
+  scroll(screen.height, color);
 }
 
 void graphics::scroll(size_t rows, uint32_t color) {
