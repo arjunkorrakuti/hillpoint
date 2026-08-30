@@ -15,6 +15,9 @@ namespace ramfs {
 
   class Store {
    public:
+    Store() = default;
+    Store(const Store&) = delete;
+    Store& operator=(const Store&) = delete;
     void initialize(memory::Heap& allocator);
     Result write(const char* name, const char* data, size_t size);
     Result remove(const char* name);
