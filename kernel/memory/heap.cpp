@@ -47,6 +47,17 @@ void* memory::Heap::allocate(size_t size) {
   return nullptr;
 }
 
+void memory::Heap::merge(Block* block) {
+  Block* next = block->next;
+  if (next != nullptr && next->free) {
+    block->size += sizeof(Block) + next->size;
+    block->next = next->next;
+    if (block->next != nullptr) {
+      block->next->previous = block;
+    }
+  }
+}
+
 bool memory::Heap::release(void* address) {
   if (address == nullptr) {
     return true;
@@ -66,17 +77,6 @@ bool memory::Heap::release(void* address) {
     return true;
   }
   return false;
-}
-
-void memory::Heap::merge(Block* block) {
-  Block* next = block->next;
-  if (next != nullptr && next->free) {
-    block->size += sizeof(Block) + next->size;
-    block->next = next->next;
-    if (block->next != nullptr) {
-      block->next->previous = block;
-    }
-  }
 }
 
 memory::HeapStats memory::Heap::stats() const {

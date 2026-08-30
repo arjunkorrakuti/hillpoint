@@ -33,15 +33,6 @@ bool memory::PageAllocator::addRegion(void* address, size_t size) {
   return true;
 }
 
-memory::PageStats memory::PageAllocator::stats() const {
-  PageStats result = {0, freePages, 0, regionCount};
-  for (size_t index = 0; index < regionCount; index++) {
-    result.totalPages += regions[index].pages;
-    result.metadataPages += regions[index].metadata;
-  }
-  return result;
-}
-
 void* memory::PageAllocator::allocate(size_t count) {
   if (count == 0 || count > freePages) {
     return nullptr;
@@ -85,4 +76,13 @@ bool memory::PageAllocator::release(void* address) {
     return true;
   }
   return false;
+}
+
+memory::PageStats memory::PageAllocator::stats() const {
+  PageStats result = {0, freePages, 0, regionCount};
+  for (size_t index = 0; index < regionCount; index++) {
+    result.totalPages += regions[index].pages;
+    result.metadataPages += regions[index].metadata;
+  }
+  return result;
 }
