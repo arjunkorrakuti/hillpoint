@@ -1,9 +1,10 @@
 #include <cpuid.h>
 #include <kernel/console.hpp>
 #include <kernel/interrupts.hpp>
-#include <kernel/runtime.hpp>
 #include <kernel/io.hpp>
+#include <kernel/runtime.hpp>
 #include <stddef.h>
+#include <stdint.h>
 
 namespace {
   struct __attribute__((packed)) Descriptor {
@@ -20,6 +21,26 @@ namespace {
     uint32_t high;
     uint32_t reserved;
   };
+
+  struct __attribute__((packed)) TaskState {
+    uint32_t reserved0;
+    uint64_t rsp[3];
+    uint64_t reserved1;
+    uint64_t stacks[7];
+    uint64_t reserved2;
+    uint16_t reserved3;
+    uint16_t ioMap;
+  };
+
+  static_assert(sizeof(Gate) == 16);
+  static_assert(sizeof(TaskState) == 104);
+  static_assert(offsetof(interrupts::Frame, vector) == 15 * 8);
+  alignas(16) Gate gates[256] = {};
+  alignas(16) uint64_t gdt[5] = {0, 0x00af9a000000ffff, 0x00cf92000000ffff, 0, 0};
+  alignas(16) TaskState task = {};
+  alignas(16) uint8_t faultStack[16384];
+  interrupts::Handler handlers[16] = {};
+  uint64_t counts[16] = {};
 
   const char* const exceptions[32] = {"Divide error",
                                       "Debug",
@@ -54,17 +75,6 @@ namespace {
                                       "Security",
                                       "Reserved"};
 
-  struct __attribute__((packed)) TaskState {
-    uint32_t reserved0;
-    uint64_t rsp[3];
-    uint64_t reserved1;
-    uint64_t stacks[7];
-    uint64_t reserved2;
-    uint16_t reserved3;
-    uint16_t ioMap;
-  };
-
-  static_assert(sizeof(TaskState) == 104);
   void remapPic() {
     unsigned int eax, ebx, ecx, edx;
     __cpuid(1, eax, ebx, ecx, edx);
@@ -108,15 +118,6 @@ namespace {
     }
     return false;
   }
-
-  static_assert(sizeof(Gate) == 16);
-  static_assert(offsetof(interrupts::Frame, vector) == 15 * 8);
-  alignas(16) Gate gates[256] = {};
-  interrupts::Handler handlers[16] = {};
-  uint64_t counts[16] = {};
-  alignas(16) uint64_t gdt[5] = {0, 0x00af9a000000ffff, 0x00cf92000000ffff, 0, 0};
-  alignas(16) TaskState task = {};
-  alignas(16) uint8_t faultStack[16384];
 }
 
 extern "C" void loadGdt(const Descriptor* descriptor);
@@ -146,6 +147,29 @@ void interrupts::initialize() {
                           .address = reinterpret_cast<uintptr_t>(gates)};
   asm volatile("lidt %0" : : "m"(idt) : "memory");
   remapPic();
+}
+
+bool interrupts::registerIrq(uint8_t irq, Handler handler) {
+  if (irq >= 16 || irq == 2 || handler == nullptr) {
+    return false;
+  }
+  const uint64_t flags = io::disableInterrupts();
+  if (handlers[irq] != nullptr) {
+    io::restoreInterrupts(flags);
+    return false;
+  }
+  handlers[irq] = handler;
+  const uint16_t port = irq < 8 ? 0x21 : 0xa1;
+  io::out(port, static_cast<uint8_t>(io::in(port) & ~(1U << (irq % 8))));
+  if (irq >= 8) {
+    io::out(0x21, static_cast<uint8_t>(io::in(0x21) & ~4U));
+  }
+  io::restoreInterrupts(flags);
+  return true;
+}
+
+uint64_t interrupts::count(uint8_t irq) {
+  return irq < 16 ? __atomic_load_n(&counts[irq], __ATOMIC_RELAXED) : 0;
 }
 
 extern "C" void interruptDispatch(const interrupts::Frame* frame) {
@@ -180,27 +204,4 @@ extern "C" void interruptDispatch(const interrupts::Frame* frame) {
                     (frame->error & 4) != 0 ? "user" : "kernel");
   }
   panic("Unhandled CPU exception");
-}
-
-bool interrupts::registerIrq(uint8_t irq, Handler handler) {
-  if (irq >= 16 || irq == 2 || handler == nullptr) {
-    return false;
-  }
-  const uint64_t flags = io::disableInterrupts();
-  if (handlers[irq] != nullptr) {
-    io::restoreInterrupts(flags);
-    return false;
-  }
-  handlers[irq] = handler;
-  const uint16_t port = irq < 8 ? 0x21 : 0xa1;
-  io::out(port, static_cast<uint8_t>(io::in(port) & ~(1U << (irq % 8))));
-  if (irq >= 8) {
-    io::out(0x21, static_cast<uint8_t>(io::in(0x21) & ~4U));
-  }
-  io::restoreInterrupts(flags);
-  return true;
-}
-
-uint64_t interrupts::count(uint8_t irq) {
-  return irq < 16 ? __atomic_load_n(&counts[irq], __ATOMIC_RELAXED) : 0;
 }
