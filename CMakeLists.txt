@@ -91,6 +91,7 @@ target_compile_options(kernel PRIVATE
   -ffreestanding
   -fno-exceptions
   -fno-rtti
+  -fno-threadsafe-statics
   -fno-stack-protector
   -fno-stack-check
   -mno-red-zone
