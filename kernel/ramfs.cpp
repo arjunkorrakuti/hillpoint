@@ -60,6 +60,17 @@ ramfs::Result ramfs::Store::write(const char* name, const char* data, size_t siz
   return Result::ok;
 }
 
+ramfs::Result ramfs::Store::remove(const char* name) {
+  for (File& file : files) {
+    if (file.data != nullptr && strcmp(file.name, name) == 0) {
+      heap->release(file.data);
+      file = {};
+      return Result::ok;
+    }
+  }
+  return Result::notFound;
+}
+
 const ramfs::File* ramfs::Store::find(const char* name) const {
   for (const File& file : files) {
     if (file.data != nullptr && strcmp(file.name, name) == 0) {
@@ -67,6 +78,10 @@ const ramfs::File* ramfs::Store::find(const char* name) const {
     }
   }
   return nullptr;
+}
+
+const ramfs::File* ramfs::Store::entry(size_t index) const {
+  return index < maxFiles && files[index].data != nullptr ? &files[index] : nullptr;
 }
 
 const char* ramfs::message(Result result) {
@@ -85,19 +100,4 @@ const char* ramfs::message(Result result) {
       return "File not found.";
   }
   return "Unknown file error.";
-}
-
-const ramfs::File* ramfs::Store::entry(size_t index) const {
-  return index < maxFiles && files[index].data != nullptr ? &files[index] : nullptr;
-}
-
-ramfs::Result ramfs::Store::remove(const char* name) {
-  for (File& file : files) {
-    if (file.data != nullptr && strcmp(file.name, name) == 0) {
-      heap->release(file.data);
-      file = {};
-      return Result::ok;
-    }
-  }
-  return Result::notFound;
 }
