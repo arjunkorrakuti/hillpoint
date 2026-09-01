@@ -29,25 +29,25 @@ set(CMAKE_EXE_LINKER_FLAGS_MINSIZEREL "" CACHE STRING "" FORCE)
 # Define kernel executable
 add_executable(kernel
   kmain.cpp
-  kernel/runtime.cpp
   kernel/boot.cpp
-  kernel/framebuffer.cpp
-  libc/string.cpp
-  kernel/font.cpp
   kernel/console.cpp
-  libc/format.cpp
-  kernel/arch/x86_64/serial.cpp
-  kernel/arch/x86_64/interrupts.S
-  kernel/arch/x86_64/interrupts.cpp
-  kernel/arch/x86_64/timer.cpp
-  kernel/input/keyboard.cpp
-  kernel/arch/x86_64/keyboard.cpp
-  kernel/input/line_editor.cpp
+  kernel/font.cpp
+  kernel/framebuffer.cpp
+  kernel/runtime.cpp
   kernel/shell.cpp
+  kernel/ramfs.cpp
+  kernel/input/keyboard.cpp
+  kernel/input/line_editor.cpp
   kernel/memory/pages.cpp
   kernel/memory/heap.cpp
   kernel/memory/memory.cpp
-  kernel/ramfs.cpp
+  kernel/arch/x86_64/interrupts.cpp
+  kernel/arch/x86_64/interrupts.S
+  kernel/arch/x86_64/keyboard.cpp
+  kernel/arch/x86_64/timer.cpp
+  kernel/arch/x86_64/serial.cpp
+  libc/format.cpp
+  libc/string.cpp
 )
 target_include_directories(kernel PRIVATE kernel/include libc/include)
 set_target_properties(kernel PROPERTIES OUTPUT_NAME "hillpoint")
@@ -127,8 +127,8 @@ target_compile_options(kernel PRIVATE
 target_link_options(kernel PRIVATE
   -nostdlib
   -static
-  -Wl,-z,noexecstack
   -z max-page-size=0x1000
+  -Wl,-z,noexecstack
   -T${PROJECT_SOURCE_DIR}/linker.lds
   -Wl,-Map=kernel.map
 )
