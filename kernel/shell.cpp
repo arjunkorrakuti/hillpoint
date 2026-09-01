@@ -1,6 +1,5 @@
 #include <kernel/console.hpp>
 #include <kernel/interrupts.hpp>
-#include <kernel/timer.hpp>
 #include <kernel/io.hpp>
 #include <kernel/keyboard.hpp>
 #include <kernel/line_editor.hpp>
@@ -8,17 +7,15 @@
 #include <kernel/ramfs.hpp>
 #include <kernel/runtime.hpp>
 #include <kernel/shell.hpp>
+#include <kernel/timer.hpp>
 #include <string.h>
 
 extern "C" [[noreturn]] void triggerDoubleFault();
+
 namespace {
   constinit LineEditor editor;
   constinit ramfs::Store files;
   void* allocations[16] = {};
-
-  void prompt() {
-    console::write("hillpoint> ");
-  }
 
   char* token(char*& input) {
     while (*input == ' ') {
@@ -37,20 +34,39 @@ namespace {
     return start;
   }
 
-  void echo(char* arguments) {
-    console::printf("%s\n", arguments);
+  bool number(const char* text, size_t& value) {
+    value = 0;
+    if (*text == '\0') {
+      return false;
+    }
+    while (*text != '\0') {
+      if (*text < '0' || *text > '9') {
+        return false;
+      }
+      const size_t digit = static_cast<size_t>(*text++ - '0');
+      if (value > (SIZE_MAX - digit) / 10) {
+        return false;
+      }
+      value = value * 10 + digit;
+    }
+    return true;
   }
 
-  void clear(char*) {
-    console::clear();
-  }
-
+  void help(char*);
   void about(char*) {
     console::printf(
       "Hillpoint: x86-64, C++23, Limine.\n"
       "Single-core kernel shell; US PS/2 keyboard input.\n"
       "Type a command, use Backspace to edit, and Enter to run it.\n"
       "RAM files disappear on reboot. Type help for commands.\n");
+  }
+
+  void clear(char*) {
+    console::clear();
+  }
+
+  void echo(char* arguments) {
+    console::printf("%s\n", arguments);
   }
 
   void uptime(char*) {
@@ -68,11 +84,6 @@ namespace {
       static_cast<unsigned long long>(interrupts::count(1)), keyboard::dropped());
   }
 
-  void stop(char*) {
-    console::printf("System halted.\n");
-    halt();
-  }
-
   void mem(char*) {
     const memory::PageStats pages = memory::pages().stats();
     const memory::HeapStats heap = memory::heap().stats();
@@ -81,24 +92,6 @@ namespace {
                     pages.regions);
     console::printf("Heap: %zu used, %zu free, %zu largest free, %zu allocations\n",
                     heap.usedBytes, heap.freeBytes, heap.largestFree, heap.allocations);
-  }
-
-  bool number(const char* text, size_t& value) {
-    value = 0;
-    if (*text == '\0') {
-      return false;
-    }
-    while (*text != '\0') {
-      if (*text < '0' || *text > '9') {
-        return false;
-      }
-      const size_t digit = static_cast<size_t>(*text++ - '0');
-      if (value > (SIZE_MAX - digit) / 10) {
-        return false;
-      }
-      value = value * 10 + digit;
-    }
-    return true;
   }
 
   void alloc(char* arguments) {
@@ -185,7 +178,10 @@ namespace {
     }
   }
 
-  void help(char*);
+  void stop(char*) {
+    console::printf("System halted.\n");
+    halt();
+  }
 
   struct Command {
     const char* name;
@@ -194,21 +190,21 @@ namespace {
   };
 
   const Command commands[] = {
-    {"fault", "fault invalid|page|double: demonstrate a fatal exception", fault},
-    {"rm", "rm <name>: delete a RAM file", rm},
-    {"cat", "cat <name>: print a RAM file", cat},
-    {"write", "write <name> [text]: create or replace a RAM file", write},
-    {"ls", "List RAM files", ls},
-    {"free", "free <slot>: release a demo heap block", release},
-    {"alloc", "alloc <bytes>: allocate a demo heap block", alloc},
-    {"mem", "Physical page and heap statistics", mem},
-    {"halt", "Stop the CPU", stop},
-    {"irq", "Interrupt and input counters", irq},
-    {"uptime", "Time since the PIT started", uptime},
+    {"help", "List commands", help},
     {"about", "Kernel features and editing keys", about},
     {"clear", "Clear the screen", clear},
     {"echo", "Print text", echo},
-    {"help", "List commands", help}};
+    {"uptime", "Time since the PIT started", uptime},
+    {"irq", "Interrupt and input counters", irq},
+    {"mem", "Physical page and heap statistics", mem},
+    {"alloc", "alloc <bytes>: allocate a demo heap block", alloc},
+    {"free", "free <slot>: release a demo heap block", release},
+    {"ls", "List RAM files", ls},
+    {"write", "write <name> [text]: create or replace a RAM file", write},
+    {"cat", "cat <name>: print a RAM file", cat},
+    {"rm", "rm <name>: delete a RAM file", rm},
+    {"fault", "fault invalid|page|double: demonstrate a fatal exception", fault},
+    {"halt", "Stop the CPU", stop}};
 
   void help(char*) {
     for (const Command& command : commands) {
@@ -231,6 +227,10 @@ namespace {
       }
     }
     console::printf("Unknown command: %s. Type help.\n", name);
+  }
+
+  void prompt() {
+    console::write("hillpoint> ");
   }
 
   void accept(keyboard::Key key) {
