@@ -133,6 +133,10 @@ target_link_options(kernel PRIVATE
   -Wl,-Map=kernel.map
 )
 
+# Check if make and xorriso are installed
+find_program(MAKE_EXECUTABLE NAMES make REQUIRED)
+find_program(XORRISO_EXECUTABLE NAMES xorriso REQUIRED)
+
 # Define script to build ISO
 set(BUILD_ISO_SCRIPT [[
 #!/bin/sh
