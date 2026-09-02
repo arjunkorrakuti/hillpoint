@@ -23,6 +23,8 @@ extern "C" void kmain() {
   console::printf("Physical page allocator and kernel heap ready.\n");
   timer::initialize();
   console::printf("PIT timer: approximately %u Hz.\n", timer::frequency);
-  console::printf("PS/2 keyboard: %s\n", keyboard::initialize() ? "ready" : "unavailable");
+  console::printf(
+    "PS/2 keyboard: %s\n",
+    keyboard::initialize() ? "ready" : "unavailable; shell input requires a PS/2 keyboard");
   shell::run();
 }
