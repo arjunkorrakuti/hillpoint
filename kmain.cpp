@@ -13,9 +13,12 @@ extern "C" void kmain() {
   if (!boot::supported()) {
     panic("Unsupported Limine base revision");
   }
+
   console::initialize(boot::framebuffer());
   interrupts::initialize();
-  console::write("Hillpoint\nA small x86-64 kernel\n");
+
+  console::printf("Hillpoint\n");
+  console::printf("A small x86-64 kernel\n\n");
   boot::printSummary();
   if (!memory::initialize()) {
     panic("Could not initialize physical memory and heap");
@@ -26,5 +29,6 @@ extern "C" void kmain() {
   console::printf(
     "PS/2 keyboard: %s\n",
     keyboard::initialize() ? "ready" : "unavailable; shell input requires a PS/2 keyboard");
+  console::printf("Kernel initialized.\n");
   shell::run();
 }
