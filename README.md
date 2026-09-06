@@ -3,6 +3,10 @@
 A hobby x86-64 operating system written in C++23 and assembly, booted with Limine.
 Built to explore how a kernel handles input, interrupts, memory, and files.
 
+## Demo
+
+<video src="https://r2.arjunko.com/hillpoint.mp4" controls width="100%"></video>
+
 ## Features
 
 - **Interactive console:** framebuffer text output with scrolling, a PS/2 keyboard
