@@ -31,3 +31,26 @@ cmake --build build --target iso
 
 Adjust the compiler path for your installation. To boot paused for debugging,
 run `./run_qemu.sh debug` and connect GDB on port `1234`.
+
+## Try it
+
+Click the QEMU window and type `help` for the command list.
+
+```text
+hillpoint> help
+help  List commands
+about  Kernel features and editing keys
+clear  Clear the screen
+echo  Print text
+uptime  Time since the PIT started
+irq  Interrupt and input counters
+mem  Physical page and heap statistics
+alloc  alloc <bytes>: allocate a demo heap block
+free  free <slot>: release a demo heap block
+ls  List RAM files
+write  write <name> [text]: create or replace a RAM file
+cat  cat <name>: print a RAM file
+rm  rm <name>: delete a RAM file
+fault  fault invalid|page|double: demonstrate a fatal exception
+halt  Stop the CPU
+```
