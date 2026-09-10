@@ -5,7 +5,7 @@ Built to explore how a kernel handles input, interrupts, memory, and files.
 
 ## Demo
 
-<video src="https://r2.arjunko.com/hillpoint.mp4" controls width="100%"></video>
+https://github.com/user-attachments/assets/eeb95076-8a0a-457b-b649-a0bbc03c0677
 
 ## Features
 
